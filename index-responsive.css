@@ -1,4 +1,7 @@
 @media screen and (max-width:800px) {
+    html{
+        overflow-x:hidden;
+    }
     body{
       display: block;
       position: relative;
