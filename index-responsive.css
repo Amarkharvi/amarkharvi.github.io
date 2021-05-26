@@ -270,12 +270,12 @@
 .skills-list{
 position: absolute;
 float: left;
-left: 50vw;
+left: 35vw;
 top: 12vh;
 }
 
 .skills-list li{
-    margin-top: 12vh;
+    margin-top: 10vh;
     list-style: none;
 }
 
@@ -512,7 +512,8 @@ top: 12vh;
           box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
         }
     #project-title{
-      margin-top: -75vh;
+      position: absolute;
+      top: 12vh;
     }
   
     .view-container{
@@ -525,9 +526,7 @@ top: 12vh;
     .view-more:hover{
       cursor: pointer;
     }
-  #project-title{
-    margin-top: -50vh;
-  }
+ 
   
   .gallery-container img{
     width: 50%;
