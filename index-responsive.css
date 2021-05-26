@@ -1,0 +1,540 @@
+@media screen and (max-width:800px) {
+    body{
+      display: block;
+      position: relative;
+      overflow-x: hidden;
+    }
+      .profile-img{
+        width: 40vh;
+        height: 40vh;
+        
+        position: absolute;
+        display: block;
+        margin-top: -10vh ;
+        margin-left: -22vh;
+        left: 50%;
+        top: 20%;
+       
+        }
+        .inner-profile{
+          width: 40vh;
+          height: 40vh;
+          display: flex;
+        justify-content: center;
+        align-items: center;
+          left: 1%;
+          top:1%;
+        }
+        .profile{
+         position: absolute;
+         width: 40vh;
+         left: 4%;
+         display: flex;
+        justify-content: center;
+        align-items: center;
+         top: 2%;
+         height: 40vh;
+        }
+        .amarprof{
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+        }
+       
+        .profile-line1{
+          width: 0%;
+        }
+        .profile-line2{
+         width: 0%;
+        }
+        .devop-desig{
+          font-size: 5px;
+          display: block;
+          left: 20%;
+          top: 65%;
+          width: 30px;
+          margin-left: -15px;
+          color: white;
+      
+      }
+      .devop-desig p{
+          font-size: 30px;
+          font-weight: bolder;
+          
+  
+          
+      }
+      .devop-desig p1{
+          font-family: 'Dancing Script', cursive;
+          font-size: 25px;
+          font-weight: 900;
+          width: 163.172px;
+          height: 28px;
+          left: 50%;
+          bottom: 50%;
+          margin-left: 81.586px;
+          margin-bottom: 14px;
+          position: absolute;
+          
+         
+      }
+
+      
+      .social-align{
+        display: block;
+        position: absolute;
+        width: 220px;
+        height: 50px;
+        bottom: 10%;
+        left: 50%;
+        margin-left:-110px ;
+        margin-bottom: 5px;
+    }
+    a,
+  a:hover,
+  a:focus,
+  a:active {
+    text-decoration: none;
+  }
+  
+  .social-icon {
+    margin-bottom: 15px;
+    margin-inline: 10px;
+     box-sizing: border-box;
+    -moz-border-radius: 138px;
+    -webkit-border-radius: 138px;
+    border-radius: 138px;
+    border: 5px solid;
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    line-height: 1px;
+    padding-top: 11px;
+    transition: all 0.5s;
+  }
+  .social-icon:hover {
+      transform: rotate(360deg)scale(1.3);
+    }
+    /* Linked-In Button Styling */
+   .linked-in {
+      font-size: 22px;
+      padding-top: 9px;
+      border-color: #005E58;
+      background-color: #005E58;
+      color: #ffffff;
+      box-shadow: 0 4px 8px 0  black;
+      
+     
+    }
+    .linked-in:hover {
+      background-color: #ffffff;
+      color: #3b5998;
+    }
+   
+    .github {
+      font-size: 22px;
+      padding-top: 9px;
+      background-color: #005E58;
+      color: #ffffff;
+      border-color: #005E58;
+      box-shadow: 0 4px 8px 0  black;
+      
+    }
+    .github:hover {
+      background-color: #ffffff;
+      color: #4183c4;
+    }
+    .instagram {
+      font-size: 22px;
+      padding-top: 9px;
+      background-color: #005E58;
+      color: #ffffff;
+      border-color: #005E58;
+      box-shadow: 0 4px 8px 0  black;
+      
+    }
+    .instagram:hover {
+      background-color: #ffffff;
+      color: #4183c4;
+    }
+    .devop-text{
+      font-size: 30px;
+      font-family: 'Righteous', cursive;
+      position: absolute;
+      display: block;
+      overflow: auto;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      width: 100%;
+      height: 50%;
+      left: 0;
+      top: 0;
+      margin-top: 7px;
+      right: 0;
+      color: white;
+  }
+
+ 
+  .title-font{
+    position: absolute;
+    width: 105.703px;
+    height: 60px;
+    left: 50%;
+    top: 14%;
+    margin-left: -52.8515px;
+    margin-top: -30px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 50px;
+    font-weight: 900;
+    color: #ffffff;
+}
+
+.logo-container{
+    width: min-content;
+    height: min-content;
+    
+}
+
+.logo-container li{
+    margin-top: 1vh;
+}
+.logo-container img{
+    position: absolute;
+    display: block;
+
+}
+.logo-container .python{
+    margin: 0;
+    position: absolute;
+    display: block;
+    
+    width: 10vh;
+    height: 10vh;
+    overflow: auto;
+    margin-left: 10vw;
+    margin-top: 20vh;
+}
+
+.logo-container .django{
+  margin: 0;
+  position: absolute;
+  display: block;
+  left: 17%;
+  width: 17vw;
+  height: 17vh;
+  overflow: auto;
+  margin-left: -8vw;
+  margin-top: 23vh;
+}
+
+.logo-container .react{
+  margin: 0;
+  position: absolute;
+  display: block;
+  left: 17%;
+  width: 17vw;
+  height: 15vh;
+  overflow: auto;
+  margin-left: -8vw;
+  margin-top: 22vh;
+}
+
+.logo-container .reactnative{
+  margin: 0;
+  position: absolute;
+  display: block;
+  left: 17%;
+  width: 37vw;
+  height: 10vh;
+  overflow: auto;
+  margin-left: -14vw;
+  margin-top: 29vh;
+}
+
+.logo-container .java{
+  margin: 0;
+  position: absolute;
+  display: block;
+  left: 17%;
+  width: 15vw;
+  height: 10vh;
+  overflow: auto;
+  margin-left: -7.5vw;
+  margin-top: 35vh;
+}
+
+
+.skills-list{
+position: absolute;
+float: left;
+left: 50vw;
+top: 12vh;
+}
+
+.skills-list li{
+    margin-top: 12vh;
+    list-style: none;
+}
+
+.bar{
+    display: block;
+    border: 1px solid white;
+    height: 3vh;
+    width: 40vw;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px white;
+}
+
+.bar .python{
+    width: 85%;
+    height: 3vh;
+    display: block;
+    background-color: white;
+    position: inherit;
+    animation: python 2s;
+
+}
+
+.bar .django{
+    width: 90%;
+    height: 3vh;
+    display: block;
+    background-color: white;
+    position: inherit;
+    animation: django 2s;
+
+}
+.bar .react{
+    width: 70%;
+    height: 3vh;
+    display: block;
+    background-color: white;
+    position: inherit;
+    animation: react 2s;
+
+}
+
+.bar .reactnative{
+    width: 80%;
+    height: 3vh;
+    display: block;
+    background-color: white;
+    position: inherit;
+    animation: reactnative 2s;
+}
+
+.bar .java{
+    width: 60%;
+    height: 3vh;
+    display: block;
+    background-color: white;
+    position: inherit;
+    animation: java 2s;
+
+}
+
+
+@keyframes java {
+    0%{
+        width: 0;
+    }
+    100%{
+        width: 60%;
+    }
+    
+  }
+  
+  @keyframes python {
+    0%{
+        width: 0;
+    }
+    100%{
+        width: 85%;
+    }
+    
+  }
+  @keyframes django {
+    0%{
+        width: 0px;
+    }
+    100%{
+        width: 90%;
+    }
+    
+  }
+  @keyframes react {
+    0%{
+        width: 0;
+    }
+    100%{
+        width: 70%;
+    }
+    
+  }
+  @keyframes reactnative {
+    0%{
+        width: 0;
+    }
+    100%{
+        width: 80%;
+    }       
+    }
+
+
+    .internships-container{
+      width: 100%;
+      height: 150vh;
+      
+  
+    }
+
+    .internships-container .title-font{
+      position: absolute;
+   float: inline-start;
+   left: 40vw;
+    }
+    
+    .internship-lists{
+      display: flex;
+      flex-direction: column;
+  flex-wrap: nowrap;
+      height: 70vh;
+      width: 100%;
+      margin: 1rem;
+      left: -10vw;
+      top: 25vh;
+      align-content: center;
+      justify-content: space-around;
+  }
+  .card1{
+      width: 80%;
+      height: 50vh;
+      border-radius: 20px;
+      left: 50%;
+      top: 10vh;
+      top: 130%;
+      margin-left: -25vw;
+      margin-top: -25vh;
+      position: absolute;
+  }
+  .card2{
+    width: 80%;
+    height: 50vh;
+    border-radius: 20px;    left: 50%;
+    top: 10vh;
+    margin-left: -25vw;
+    position: absolute;
+  }
+  
+  .card2 p,.card1 p{
+    position: absolute;
+    top: 80%;
+    text-align: center;
+  }
+  
+  .cards-container{
+  
+    grid-auto-rows: auto;
+    grid-gap: 1rem;
+    margin-left: 15vw;
+    padding-top: 30vh;   
+    }
+    .cards {
+     
+      margin-left: 15vw;
+      padding-top: 30vh;   
+      }
+       
+      .cardx1,.cardx2,.cardy1,.cardy2{
+     
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        border-radius: 10px;
+        width: 70vw;
+        height: min-content;
+        margin: 1rem;
+        position: absolute;
+        justify-content: center;
+        }
+  
+        .cardx1{
+          top: 25vh;
+          left: 13vw;
+        }
+        .cardx2{
+          top: 90vh;
+          left: 13vw;
+        }
+        .cardy1{
+          top: 160vh;
+          left: 13vw;
+        }
+        .cardy2{
+          top: 230vh;
+          left: 13vw;
+        }
+  
+        .cards img{
+          height: 40vh;
+          position: inherit;
+          width: 100%;
+        }
+        .cards p{
+          font-size: 2vh;
+          width: 80vw;
+          height: 20vh;
+        }
+  
+        .cards .p1{
+          left: 15vw;
+          bottom: 10vh;
+        }
+        .cards .p2{
+          top: 275vh;
+          left: 15vw;
+          height: 10vh;
+          bottom: 10vh;
+        }
+        .cards .p4{
+          top: 135vh;
+          left: 15vw;
+        }
+        .cards .p3{
+          top: 207vh;
+          left: 15vw;
+        }
+  
+        .card:hover {
+          box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+    #project-title{
+      margin-top: -75vh;
+    }
+  
+    .view-container{
+      margin-top: 260vh;
+      margin-left: 3vw;
+    }
+    .view-more{
+      text-align: center;
+    }
+    .view-more:hover{
+      cursor: pointer;
+    }
+  #project-title{
+    margin-top: -50vh;
+  }
+  
+  .gallery-container img{
+    width: 50%;
+    height: 50%;
+  }
+  .continued p{
+    position: inherit;
+    top: 0;
+  }
+  }
