@@ -569,12 +569,10 @@ top: 12vh;
   width: 100%;
 }
 
-
+#about{
+  display: none;
+}
+}
 
  
 
-<<<<<<< HEAD
-  }
-=======
-  }
->>>>>>> 1246914cc4fc6ab65a7fa48865b307551e2fc846
