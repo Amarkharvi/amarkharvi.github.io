@@ -16,6 +16,7 @@
     
     <body>
         <div class="desc-container">
+            <div class="visitContainer" >visits :  <p id="visits"  style=" margin-left:3px;color:orangered"></p></div>
             <div class="profile-container">
             <div class="profile-line1"></div>
             <div class="profile-line2"></div>
@@ -290,6 +291,13 @@
           }
           </script>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <!--- profile visit count-->
+      <script async src="https://api.countapi.xyz/hit/amarkharvi.github.io/07f8551c-fce1-441a-8e19-e0478a93cc00?callback=websiteVisits"></script>
+      <script>
+        function websiteVisits(response) {
+            document.querySelector("#visits").textContent = response.value;
+        }
+      </script>
     </body>
     
 </html>

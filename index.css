@@ -9,6 +9,21 @@ body{
   overflow-x: hidden;
 }
 
+.visitContainer{
+  display: flex;
+  background-color: white;
+  color: #005E58;
+  font-size: 12px;
+  font-family: 'Righteous', cursive;
+  width: 70px;
+  position: absolute;
+  padding: 5px;
+  right: 0;
+  top: 15px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
 .desc-container{
   background-color: #005E58;
   width: 100%;
