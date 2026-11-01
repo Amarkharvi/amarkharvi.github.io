@@ -16,8 +16,17 @@ export function githubToken(): string | null {
 	return sessionStorage.getItem(TOKEN_KEY);
 }
 
+// A token pasted from a chat app, notes, or a password manager can carry an invisible character
+// (zero-width space, a smart quote, a stray newline) that `.trim()` doesn't catch. Browsers reject
+// `fetch()` headers containing anything outside Latin-1, which otherwise surfaces as a cryptic
+// "String contains non ISO-8859-1 code point" error. GitHub tokens are only ever `[A-Za-z0-9_]`,
+// so strip everything else.
+function sanitizeToken(token: string): string {
+	return token.trim().replace(/[^\x21-\x7e]/g, "");
+}
+
 export function setGithubToken(token: string) {
-	sessionStorage.setItem(TOKEN_KEY, token.trim());
+	sessionStorage.setItem(TOKEN_KEY, sanitizeToken(token));
 }
 
 export function clearGithubToken() {
@@ -69,7 +78,9 @@ function encodeUtf8(value: string): string {
 	return btoa(binary);
 }
 
-export async function verifyGithubToken(token: string): Promise<void> {
+export async function verifyGithubToken(rawToken: string): Promise<void> {
+	const token = sanitizeToken(rawToken);
+	if (!token) throw new Error("Paste a GitHub token first.");
 	const res = await fetch(`https://api.github.com/repos/${REPO}`, { headers: headers(token, false) });
 	if (!res.ok) throw new Error(await githubError(res));
 }
