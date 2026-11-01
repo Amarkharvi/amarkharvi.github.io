@@ -1,0 +1,311 @@
+@import "tailwindcss";
+@import "material-symbols/outlined.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@font-face {
+	font-family: "Plus Jakarta Sans";
+	font-style: normal;
+	font-weight: 200 800;
+	font-display: swap;
+	src: url("/media/fonts/plus-jakarta-sans-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Newsreader";
+	font-style: normal;
+	font-weight: 200 800;
+	font-display: swap;
+	src: url("/media/fonts/newsreader-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Newsreader";
+	font-style: italic;
+	font-weight: 200 800;
+	font-display: swap;
+	src: url("/media/fonts/newsreader-italic-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 100 800;
+	font-display: swap;
+	src: url("/media/fonts/jetbrains-mono-latin.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url("/media/fonts/space-grotesk-latin.woff2") format("woff2");
+}
+
+/* Light: "Indigo Paper" — white surfaces, indigo ink, royal-blue + cyan accents */
+:root,
+[data-theme="light"] {
+	color-scheme: light;
+	--font-jakarta: "Plus Jakarta Sans";
+	--font-newsreader: "Newsreader";
+	--font-jetbrains: "JetBrains Mono";
+	--font-space-grotesk: "Space Grotesk";
+	--background: #f7f8ff;
+	--surface: #f7f8ff;
+	--surface-container-lowest: #ffffff;
+	--surface-container-low: #f0f2fe;
+	--surface-container: #e9ecfc;
+	--surface-container-high: #e1e5fa;
+	--surface-container-highest: #d8ddf6;
+	--surface-variant: #dce1f7;
+	--on-surface: #10133a;
+	--on-surface-variant: #464b70;
+	--outline: #757a9e;
+	--outline-variant: #c5cae8;
+
+	--primary: #3505c8;
+	--on-primary: #ffffff;
+	--primary-container: #4e35de;
+	--on-primary-container: #dcd6ff;
+	--primary-fixed: #e4dfff;
+	--primary-fixed-dim: #c6bfff;
+	--on-primary-fixed: #160066;
+
+	--secondary: #1d4ed8;
+	--on-secondary: #ffffff;
+	--secondary-container: #c7d6ff;
+	--on-secondary-container: #0b2a80;
+	--secondary-fixed: #dbe5ff;
+	--secondary-fixed-dim: #9db8ff;
+	--on-secondary-fixed: #001850;
+
+	--tertiary: #00668c;
+	--on-tertiary: #ffffff;
+	--tertiary-fixed: #8fe3ff;
+	--tertiary-fixed-dim: #3cc6f2;
+	--on-tertiary-fixed: #002233;
+
+	--inverse-surface: #14183f;
+	--inverse-on-surface: #eef0ff;
+	--error: #ba1a1a;
+
+	--glow: 0 0 0 transparent;
+	--card-shadow: 0 12px 32px -6px rgb(40 30 160 / 0.1);
+	--headline-font: var(--font-jakarta);
+}
+
+/* Dark: "Indigo Night" — deep navy, the same indigo lifted for contrast, cyan highlights */
+[data-theme="dark"] {
+	color-scheme: dark;
+	--background: #090b1f;
+	--surface: #090b1f;
+	--surface-container-lowest: #060716;
+	--surface-container-low: #0f1230;
+	--surface-container: #151940;
+	--surface-container-high: #1c214e;
+	--surface-container-highest: #252b5e;
+	--surface-variant: #1c214e;
+	--on-surface: #eef0ff;
+	--on-surface-variant: #a3a9d6;
+	--outline: #6c72a3;
+	--outline-variant: #2e3468;
+
+	--primary: #7b6cff;
+	--on-primary: #ffffff;
+	--primary-container: #4e35de;
+	--on-primary-container: #dcd6ff;
+	--primary-fixed: #2a1f8f;
+	--primary-fixed-dim: #b8afff;
+	--on-primary-fixed: #e4dfff;
+
+	--secondary: #7aa2ff;
+	--on-secondary: #06103a;
+	--secondary-container: #1e3a8a;
+	--on-secondary-container: #cfdcff;
+	--secondary-fixed: #1a2a6b;
+	--secondary-fixed-dim: #8fb0ff;
+	--on-secondary-fixed: #dbe5ff;
+
+	--tertiary: #4fd1ff;
+	--on-tertiary: #002233;
+	--tertiary-fixed: #8fe3ff;
+	--tertiary-fixed-dim: #4fd1ff;
+	--on-tertiary-fixed: #002233;
+
+	--inverse-surface: #05061a;
+	--inverse-on-surface: #e4e7ff;
+	--error: #ffb4ab;
+
+	--glow: 0 0 16px rgb(123 108 255 / 0.4);
+	--card-shadow: 0 0 24px -8px rgb(123 108 255 / 0.18);
+	--headline-font: var(--font-space-grotesk);
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-surface: var(--surface);
+	--color-surface-container-lowest: var(--surface-container-lowest);
+	--color-surface-container-low: var(--surface-container-low);
+	--color-surface-container: var(--surface-container);
+	--color-surface-container-high: var(--surface-container-high);
+	--color-surface-container-highest: var(--surface-container-highest);
+	--color-surface-variant: var(--surface-variant);
+	--color-on-surface: var(--on-surface);
+	--color-on-surface-variant: var(--on-surface-variant);
+	--color-outline: var(--outline);
+	--color-outline-variant: var(--outline-variant);
+	--color-primary: var(--primary);
+	--color-on-primary: var(--on-primary);
+	--color-primary-container: var(--primary-container);
+	--color-on-primary-container: var(--on-primary-container);
+	--color-primary-fixed: var(--primary-fixed);
+	--color-primary-fixed-dim: var(--primary-fixed-dim);
+	--color-on-primary-fixed: var(--on-primary-fixed);
+	--color-secondary: var(--secondary);
+	--color-on-secondary: var(--on-secondary);
+	--color-secondary-container: var(--secondary-container);
+	--color-on-secondary-container: var(--on-secondary-container);
+	--color-secondary-fixed: var(--secondary-fixed);
+	--color-secondary-fixed-dim: var(--secondary-fixed-dim);
+	--color-on-secondary-fixed: var(--on-secondary-fixed);
+	--color-tertiary: var(--tertiary);
+	--color-on-tertiary: var(--on-tertiary);
+	--color-tertiary-fixed: var(--tertiary-fixed);
+	--color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+	--color-on-tertiary-fixed: var(--on-tertiary-fixed);
+	--color-inverse-surface: var(--inverse-surface);
+	--color-inverse-on-surface: var(--inverse-on-surface);
+	--color-error: var(--error);
+
+	--font-sans: var(--font-jakarta);
+	--font-serif: var(--font-newsreader);
+	--font-mono: var(--font-jetbrains);
+	--font-headline: var(--headline-font);
+
+	--shadow-glow: var(--glow);
+	--shadow-card: var(--card-shadow);
+}
+
+@theme {
+	--text-display-hero: 56px;
+	--text-display-hero--line-height: 64px;
+	--text-display-hero--letter-spacing: -0.02em;
+	--text-display-hero-mobile: 36px;
+	--text-display-hero-mobile--line-height: 44px;
+	--text-display-hero-mobile--letter-spacing: -0.01em;
+	--text-headline-code: 44px;
+	--text-headline-code--line-height: 52px;
+	--text-headline-code--letter-spacing: -0.03em;
+	--text-headline-code-mobile: 30px;
+	--text-headline-code-mobile--line-height: 38px;
+	--text-headline-code-mobile--letter-spacing: -0.02em;
+	--text-headline-lg: 32px;
+	--text-headline-lg--line-height: 40px;
+	--text-headline-md: 24px;
+	--text-headline-md--line-height: 32px;
+	--text-headline-sm: 20px;
+	--text-headline-sm--line-height: 28px;
+	--text-body-editorial: 18px;
+	--text-body-editorial--line-height: 28px;
+	--text-body-editorial--letter-spacing: 0.01em;
+	--text-body-default: 15px;
+	--text-body-default--line-height: 24px;
+	--text-body-dense: 13px;
+	--text-body-dense--line-height: 20px;
+	--text-label-mono: 12px;
+	--text-label-mono--line-height: 16px;
+	--text-label-mono--letter-spacing: 0.04em;
+	--text-label-pill: 12px;
+	--text-label-pill--line-height: 16px;
+	--text-label-pill--letter-spacing: 0.02em;
+
+	--animate-flash-hold: flash-hold 1.8s ease-out forwards;
+
+	@keyframes flash-hold {
+		0%,
+		85% {
+			opacity: 1;
+		}
+		100% {
+			opacity: 0.999;
+		}
+	}
+}
+
+@layer base {
+	html {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	body {
+		background-color: var(--background);
+		color: var(--on-surface);
+		font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+		overscroll-behavior-y: none;
+		transition:
+			background-color 0.35s ease,
+			color 0.35s ease;
+	}
+
+	[data-theme="dark"] body {
+		background-image: radial-gradient(ellipse at top, rgb(78 53 222 / 0.28) 0%, transparent 60%);
+		background-attachment: fixed;
+	}
+
+	::selection {
+		background-color: color-mix(in srgb, var(--primary) 30%, transparent);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--primary);
+		outline-offset: 2px;
+	}
+}
+
+@utility pb-safe {
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility pt-safe {
+	padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility no-scrollbar {
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+@utility writing-vertical {
+	writing-mode: vertical-rl;
+}
+
+.material-symbols-outlined {
+	font-variation-settings:
+		"FILL" 0,
+		"wght" 400,
+		"GRAD" 0,
+		"opsz" 24;
+	line-height: 1;
+	user-select: none;
+}
+
+input[type="range"] {
+	accent-color: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+
+	.animate-flash-hold {
+		animation-duration: 1.8s !important;
+	}
+}

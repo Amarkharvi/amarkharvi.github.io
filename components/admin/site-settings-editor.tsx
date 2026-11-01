@@ -1,0 +1,71 @@
+"use client";
+
+import { useActionState, useState } from "react";
+import { Card, Field } from "@/components/admin/fields";
+import { SaveBar } from "@/components/admin/fields";
+import type { SiteSettings, SocialLink } from "@/lib/site-settings";
+import { saveSiteSettingsAction, type SiteFormState } from "@/app/admin/(dashboard)/site/actions";
+
+const initialState: SiteFormState = { error: null, saved: false };
+
+export function SiteSettingsEditor({ initialSettings }: { initialSettings: SiteSettings }) {
+	const [settings, setSettings] = useState<SiteSettings>(initialSettings);
+	const [state, action, pending] = useActionState(saveSiteSettingsAction, initialState);
+
+	function updateSocial(key: keyof SiteSettings["socials"], patch: Partial<SocialLink>) {
+		setSettings((prev) => ({ ...prev, socials: { ...prev.socials, [key]: { ...prev.socials[key], ...patch } } }));
+	}
+
+	return (
+		<form action={action} className="flex flex-col gap-4 pb-24">
+			<input type="hidden" name="settings" value={JSON.stringify(settings)} />
+
+			<Card>
+				<div className="grid gap-3 md:grid-cols-2">
+					<Field label="Name" value={settings.name} onChange={(value) => setSettings((prev) => ({ ...prev, name: value }))} />
+					<Field label="Role" value={settings.role} onChange={(value) => setSettings((prev) => ({ ...prev, role: value }))} />
+					<Field label="Tagline (header)" value={settings.tagline} onChange={(value) => setSettings((prev) => ({ ...prev, tagline: value }))} />
+					<Field label="Availability pill" value={settings.availability} onChange={(value) => setSettings((prev) => ({ ...prev, availability: value }))} />
+					<Field label="Location" value={settings.location} onChange={(value) => setSettings((prev) => ({ ...prev, location: value }))} />
+					<Field
+						label="WhatsApp number"
+						value={settings.whatsapp}
+						placeholder="91XXXXXXXXXX"
+						onChange={(value) => setSettings((prev) => ({ ...prev, whatsapp: value }))}
+						className="md:col-span-2"
+					/>
+				</div>
+				<p className="font-sans text-[12px] text-on-surface-variant">
+					Country code plus number, no spaces. LUT orders on the shop open a WhatsApp chat to this number.
+				</p>
+			</Card>
+
+			<Card>
+				<div>
+					<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Watch &amp; follow</span>
+					<p className="font-sans text-[12px] text-on-surface-variant">Highlighted with YouTube/Instagram colors on the Dual Persona and About pages.</p>
+				</div>
+				{(["youtube", "instagram"] as const).map((key) => (
+					<div key={key} className="grid gap-2 rounded-lg bg-surface-container-low p-2.5 md:grid-cols-3">
+						<Field label={`${key} label`} value={settings.socials[key].label} onChange={(value) => updateSocial(key, { label: value })} />
+						<Field label={`${key} handle`} value={settings.socials[key].handle} onChange={(value) => updateSocial(key, { handle: value })} />
+						<Field label={`${key} link`} value={settings.socials[key].href} onChange={(value) => updateSocial(key, { href: value })} />
+					</div>
+				))}
+			</Card>
+
+			<Card>
+				<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Other social links</span>
+				{(["github", "linkedin", "twitter"] as const).map((key) => (
+					<div key={key} className="grid gap-2 rounded-lg bg-surface-container-low p-2.5 md:grid-cols-3">
+						<Field label={`${key} label`} value={settings.socials[key].label} onChange={(value) => updateSocial(key, { label: value })} />
+						<Field label={`${key} handle`} value={settings.socials[key].handle} onChange={(value) => updateSocial(key, { handle: value })} />
+						<Field label={`${key} link`} value={settings.socials[key].href} onChange={(value) => updateSocial(key, { href: value })} />
+					</div>
+				))}
+			</Card>
+
+			<SaveBar pending={pending} saved={state.saved} error={state.error} />
+		</form>
+	);
+}
