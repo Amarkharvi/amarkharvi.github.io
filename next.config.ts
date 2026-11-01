@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
   cacheComponents: true,
   images: {
     qualities: [75, 90],
