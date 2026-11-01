@@ -42,15 +42,19 @@ function createRainAmbience(ctx: AudioContext) {
 	return { source, gain };
 }
 
-export function ReelPlayer() {
+export function ReelPlayer({ video, poster }: { video?: string; poster?: string }) {
 	const [playing, setPlaying] = useState(false);
 	const [frame, setFrame] = useState(START_FRAME);
 	const [soundOn, setSoundOn] = useState(false);
 	const frameRef = useRef(START_FRAME);
 	const audioRef = useRef<{ ctx: AudioContext; gain: GainNode } | null>(null);
+	const videoRef = useRef<HTMLVideoElement>(null);
+	const posterSrc = poster || "/media/work/quiet-moments-train.png";
 
+	// With an uploaded clip, `onTimeUpdate` below drives the timecode from the real playback
+	// position. Without one, this simulates a steady 24fps advance over the still image.
 	useEffect(() => {
-		if (!playing) return;
+		if (!playing || video) return;
 		let raf = 0;
 		let origin: number | null = null;
 		const base = frameRef.current;
@@ -65,7 +69,7 @@ export function ReelPlayer() {
 		};
 		raf = requestAnimationFrame(tick);
 		return () => cancelAnimationFrame(raf);
-	}, [playing]);
+	}, [playing, video]);
 
 	useEffect(() => {
 		return () => {
@@ -91,16 +95,40 @@ export function ReelPlayer() {
 		}
 	}
 
+	function togglePlaying() {
+		if (video && videoRef.current) {
+			if (playing) videoRef.current.pause();
+			else videoRef.current.play().catch(() => {});
+		}
+		setPlaying((p) => !p);
+	}
+
 	return (
 		<div id="reel" className="relative flex aspect-video w-full scroll-mt-24 flex-col justify-between overflow-hidden rounded-xl bg-inverse-surface p-2 shadow-xl">
-			<Image
-				src="/media/work/quiet-moments-train.png"
-				alt="Showreel still — window light on a seated figure"
-				fill
-				preload
-				sizes="(min-width: 1024px) 900px, 100vw"
-				className={cn("object-cover opacity-90 transition-transform ease-linear", playing ? "scale-110 duration-[20s]" : "scale-100 duration-700")}
-			/>
+			{video ? (
+				<video
+					ref={videoRef}
+					src={video}
+					poster={posterSrc}
+					muted
+					loop
+					playsInline
+					onTimeUpdate={(event) => setFrame(START_FRAME + Math.floor(event.currentTarget.currentTime * FPS))}
+					className={cn(
+						"absolute inset-0 h-full w-full object-cover opacity-90 transition-transform ease-linear",
+						playing ? "scale-110 duration-[20s]" : "scale-100 duration-700",
+					)}
+				/>
+			) : (
+				<Image
+					src={posterSrc}
+					alt="Showreel still — window light on a seated figure"
+					fill
+					preload
+					sizes="(min-width: 1024px) 900px, 100vw"
+					className={cn("object-cover opacity-90 transition-transform ease-linear", playing ? "scale-110 duration-[20s]" : "scale-100 duration-700")}
+				/>
+			)}
 			<div className="pointer-events-none absolute inset-x-0 top-0 h-4 bg-black/80" />
 			<div className="pointer-events-none absolute inset-x-0 bottom-0 h-4 bg-black/80" />
 
@@ -115,7 +143,7 @@ export function ReelPlayer() {
 			<div className="relative z-10 my-auto flex items-center justify-center">
 				<button
 					type="button"
-					onClick={() => setPlaying((p) => !p)}
+					onClick={togglePlaying}
 					aria-label={playing ? "Pause showreel" : "Play showreel"}
 					className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-container-lowest/90 text-primary shadow-lg backdrop-blur-md transition-all hover:bg-surface-container-lowest active:scale-95 dark:shadow-glow"
 				>

@@ -4,6 +4,7 @@ import { FilmCard } from "@/components/cinema/film-card";
 import { ReelPlayer } from "@/components/cinema/reel-player";
 import { Icon } from "@/components/ui/icon";
 import { getFilms } from "@/lib/content";
+import { getSiteSettings } from "@/lib/site-settings";
 import { docs } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CinemaPage() {
-	const films = await getFilms();
+	const [films, settings] = await Promise.all([getFilms(), getSiteSettings()]);
 	return (
 		<div className="flex flex-col">
 			<div className="flex items-center justify-between gap-2 bg-surface-container-low px-5 py-2 md:mt-4 md:rounded-full md:px-6 dark:border-b dark:border-primary/10 md:dark:border">
@@ -27,7 +28,7 @@ export default async function CinemaPage() {
 			</div>
 
 			<section className="flex flex-col gap-2 px-5 pt-4 md:px-8">
-				<ReelPlayer />
+				<ReelPlayer video={settings.reel.video || undefined} poster={settings.reel.poster} />
 				<div className="flex items-center justify-between gap-2 rounded-lg bg-surface-container px-3.5 py-2.5 shadow-sm dark:border dark:border-primary/10">
 					<div className="flex min-w-0 items-center gap-2">
 						<Icon name="videocam" className="text-[20px] text-secondary dark:text-primary" />

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
 import { saveProducts, type Product } from "@/lib/products";
 
@@ -42,7 +42,7 @@ export async function saveProductsAction(_prevState: ProductsFormState, formData
 	}
 
 	await saveProducts(parsed);
-	updateTag("content:products");
+	revalidateTag("content:products", { expire: 0 });
 	revalidatePath("/shop");
 
 	return { error: null, saved: true };

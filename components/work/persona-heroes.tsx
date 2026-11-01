@@ -9,16 +9,29 @@ const stackTools = ["ColdFusion", "Django", "PostgreSQL", "Next.js"];
 
 export async function CinemaHero() {
 	const settings = await getSiteSettings();
+	const poster = settings.reel.poster || "/media/work/quiet-moments-train.png";
 	return (
 		<TiltCard strength={5} className="relative flex h-full min-h-[400px] flex-col justify-between overflow-hidden bg-inverse-surface p-5 text-white md:p-7">
-			<Image
-				src="/media/work/quiet-moments-train.png"
-				alt="Window light on a seated figure, the cover frame for the cinematography side"
-				fill
-				preload
-				sizes="(min-width: 768px) 60vw, 100vw"
-				className="object-cover"
-			/>
+			{settings.reel.video ? (
+				<video
+					src={settings.reel.video}
+					poster={poster}
+					autoPlay
+					muted
+					loop
+					playsInline
+					className="absolute inset-0 h-full w-full object-cover"
+				/>
+			) : (
+				<Image
+					src={poster}
+					alt="Window light on a seated figure, the cover frame for the cinematography side"
+					fill
+					preload
+					sizes="(min-width: 768px) 60vw, 100vw"
+					className="object-cover"
+				/>
+			)}
 			<div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-black/45" />
 			<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(53,5,200,0.4),transparent_60%)]" />
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
 import { saveFilms, type Film } from "@/lib/content";
 
@@ -44,7 +44,7 @@ export async function saveFilmsAction(_prevState: FilmsFormState, formData: Form
 	}
 
 	await saveFilms(parsed);
-	updateTag("content:films");
+	revalidateTag("content:films", { expire: 0 });
 	revalidatePath("/cinema");
 	revalidatePath("/cinema/quiet-moments");
 	revalidatePath("/");

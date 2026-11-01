@@ -5,6 +5,10 @@
 	"location": "Bengaluru • Remote",
 	"role": "Full-stack & Cinema",
 	"whatsapp": "+919110819846",
+	"reel": {
+		"video": "/media/uploads/VN20261101_205723-1793548034988-2c7eaea8.mp4",
+		"poster": "/media/uploads/Screenshot-2026-11-01-at-9-22-01-PM-1793548356383-c06fb17c.png"
+	},
 	"socials": {
 		"github": {
 			"label": "GitHub",

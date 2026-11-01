@@ -1,6 +1,6 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
 import { saveSiteSettings, type SiteSettings } from "@/lib/site-settings";
 
@@ -12,6 +12,12 @@ function isSocial(value: unknown): boolean {
 	return typeof social.label === "string" && typeof social.handle === "string" && typeof social.href === "string";
 }
 
+function isReel(value: unknown): boolean {
+	if (!value || typeof value !== "object") return false;
+	const reel = value as Record<string, unknown>;
+	return typeof reel.video === "string" && typeof reel.poster === "string";
+}
+
 function isSettings(value: unknown): value is SiteSettings {
 	if (!value || typeof value !== "object") return false;
 	const settings = value as Record<string, unknown>;
@@ -21,7 +27,8 @@ function isSettings(value: unknown): value is SiteSettings {
 		typeof settings.availability !== "string" ||
 		typeof settings.location !== "string" ||
 		typeof settings.role !== "string" ||
-		typeof settings.whatsapp !== "string"
+		typeof settings.whatsapp !== "string" ||
+		!isReel(settings.reel)
 	) {
 		return false;
 	}
@@ -50,7 +57,9 @@ export async function saveSiteSettingsAction(_prevState: SiteFormState, formData
 	}
 
 	await saveSiteSettings(parsed);
-	updateTag("content:site-settings");
+	revalidateTag("content:site-settings", { expire: 0 });
+	revalidatePath("/");
+	revalidatePath("/cinema");
 
 	return { error: null, saved: true };
 }

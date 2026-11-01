@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, updateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
 import { saveCredentials, saveTechStack, type Credentials, type TechStackItem } from "@/lib/content";
 
@@ -24,7 +24,7 @@ export async function saveTechStackAction(_prevState: StackFormState, formData: 
 		return { error: "Every skill needs a label and a group.", saved: false };
 	}
 	await saveTechStack(parsed);
-	updateTag("content:tech-stack");
+	revalidateTag("content:tech-stack", { expire: 0 });
 	revalidatePath("/lab");
 	return { error: null, saved: true };
 }
@@ -53,7 +53,7 @@ export async function saveCredentialsAction(_prevState: StackFormState, formData
 		return { error: "Each credential needs an icon, a title, and body text.", saved: false };
 	}
 	await saveCredentials(parsed);
-	updateTag("content:credentials");
+	revalidateTag("content:credentials", { expire: 0 });
 	revalidatePath("/about");
 	return { error: null, saved: true };
 }

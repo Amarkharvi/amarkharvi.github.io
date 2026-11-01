@@ -3,17 +3,22 @@
 import { useActionState, useState } from "react";
 import { Card, Field } from "@/components/admin/fields";
 import { SaveBar } from "@/components/admin/fields";
-import type { SiteSettings, SocialLink } from "@/lib/site-settings";
-import { saveSiteForm, type SaveState } from "@/lib/admin/browser-store";
+import { MediaPicker } from "@/components/admin/media-picker";
+import type { ReelSettings, SiteSettings, SocialLink } from "@/lib/site-settings";
+import { saveSiteForm, type SaveState, type UploadItem } from "@/lib/admin/browser-store";
 
 const initialState: SaveState = { error: null, saved: false };
 
-export function SiteSettingsEditor({ initialSettings }: { initialSettings: SiteSettings }) {
+export function SiteSettingsEditor({ initialSettings, media }: { initialSettings: SiteSettings; media: UploadItem[] }) {
 	const [settings, setSettings] = useState<SiteSettings>(initialSettings);
 	const [state, action, pending] = useActionState(saveSiteForm, initialState);
 
 	function updateSocial(key: keyof SiteSettings["socials"], patch: Partial<SocialLink>) {
 		setSettings((prev) => ({ ...prev, socials: { ...prev.socials, [key]: { ...prev.socials[key], ...patch } } }));
+	}
+
+	function updateReel(patch: Partial<ReelSettings>) {
+		setSettings((prev) => ({ ...prev, reel: { ...prev.reel, ...patch } }));
 	}
 
 	return (
@@ -38,6 +43,20 @@ export function SiteSettingsEditor({ initialSettings }: { initialSettings: SiteS
 				<p className="font-sans text-[12px] text-on-surface-variant">
 					Country code plus number, no spaces. LUT orders on the shop open a WhatsApp chat to this number.
 				</p>
+			</Card>
+
+			<Card>
+				<div>
+					<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Showreel</span>
+					<p className="font-sans text-[12px] text-on-surface-variant">
+						Plays behind the &quot;Behind the camera&quot; hero on the Dual Persona home page, and in the player at the top of Cinema. Upload it in
+						the Media Library first, then pick it here. Leave it empty to keep the still image.
+					</p>
+				</div>
+				<div className="grid gap-3 md:grid-cols-2">
+					<MediaPicker label="Showreel video" value={settings.reel.video} onChange={(value) => updateReel({ video: value })} media={media} />
+					<MediaPicker label="Poster image (shown before/without video)" value={settings.reel.poster} onChange={(value) => updateReel({ poster: value })} media={media} />
+				</div>
 			</Card>
 
 			<Card>
