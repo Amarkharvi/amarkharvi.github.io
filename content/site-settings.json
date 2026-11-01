@@ -1,0 +1,35 @@
+{
+	"name": "Amar Kharvi",
+	"tagline": "Amar Kharvi // Dev & Cinema",
+	"availability": "Open for builds & shoots",
+	"location": "Bengaluru • Remote",
+	"role": "Full-stack & Cinema",
+	"whatsapp": "",
+	"socials": {
+		"github": {
+			"label": "GitHub",
+			"handle": "github.com/Amarkharvi",
+			"href": "https://github.com/Amarkharvi"
+		},
+		"linkedin": {
+			"label": "LinkedIn",
+			"handle": "linkedin.com/in/amar-kharvi",
+			"href": "https://www.linkedin.com/in/amar-kharvi"
+		},
+		"twitter": {
+			"label": "X",
+			"handle": "@AmarKharvi",
+			"href": "https://x.com/AmarKharvi"
+		},
+		"youtube": {
+			"label": "YouTube",
+			"handle": "youtube.com/@AmarKharvi",
+			"href": "https://youtube.com/@Amar.Kharvi"
+		},
+		"instagram": {
+			"label": "Instagram",
+			"handle": "@AmarKharvi",
+			"href": "https://instagram.com/Amar_Kharvi"
+		}
+	}
+}
