@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# scripts/build-static.mjs moves these here for the duration of the static build
+/.static-export-stash/
+
 # production
 /build
 

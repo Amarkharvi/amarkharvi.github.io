@@ -104,6 +104,25 @@ Products and prices live in `lib/products.ts` (prices in paise). The files you s
 
 **Persistence matters more than usual here.** `content/*.json` and `public/media/uploads/*` are intentionally gitignored — they're live, admin-edited data, not source. If your deploy process does a fresh `git clone` on every deploy (for example, a GitHub Actions workflow that rebuilds from a clean checkout), those two directories will be wiped on the next deploy unless you keep them outside that checkout — e.g. a persistent disk/volume mounted at those paths, or a deploy step that copies them back in after checkout and before build. Back them up the same way you'd back up a database.
 
+## Static export (GitHub Pages)
+
+GitHub Pages only serves static files — there's no server to run `/admin` (cookies, Server Actions) or the API routes (`/api/*`). `.github/workflows/github-pages.yml` builds a GitHub Pages–only subset with those left out:
+
+```bash
+npm run build:static   # writes ./out
+```
+
+`scripts/build-static.mjs` moves `app/admin`, `app/api`, and `components/admin` out of the way for the duration of the build (and always moves them back, even if the build fails), and temporarily strips the `"use cache"`/`cacheTag` calls from `lib/{about,content,products,site-settings}.ts` — that directive needs `cacheComponents`, which can't be combined with `output: "export"`. The functions just run once as plain `async` calls instead, which is all a one-shot static build needs anyway. `next.config.ts` switches to `output: "export"` and an unoptimized image loader when `STATIC_EXPORT=1`.
+
+Two things degrade on purpose, since there's no server to send a form to:
+
+- The About page's inquiry forms show a message pointing at GitHub/LinkedIn/X instead of submitting.
+- The Lab page's papers terminal skips the email step and downloads the PDF directly.
+
+The LUT shop's "Order on WhatsApp" button needs no API either way, so it's unaffected. The admin-edited `content/*.json` files are gitignored, so the export always bakes in the defaults from `lib/*.ts` — there's no live editing on this build.
+
+For the full app — admin, the inquiry API, everything — deploy to a host that runs a Node server (e.g. Vercel) with `npm run build` / `npm start`, same as before.
+
 ## Implementation notes
 
 - **Theme without a flash.** An inline `<head>` script sets `data-theme` before the first paint. The Tailwind `dark:` variant is keyed on that attribute.
