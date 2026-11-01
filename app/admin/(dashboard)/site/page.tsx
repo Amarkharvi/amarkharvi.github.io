@@ -1,23 +1,32 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { AdminLoading } from "@/components/admin/fields";
-import { SiteSettingsEditor } from "@/components/admin/site-settings-editor";
-import { requireAdmin } from "@/lib/admin/guard";
-import { getSiteSettings } from "@/lib/site-settings";
+"use client";
 
-export const metadata: Metadata = { title: "Site Basics", robots: { index: false, follow: false } };
+import { useEffect, useState } from "react";
+import { SiteSettingsEditor } from "@/components/admin/site-settings-editor";
+import { AdminLoading } from "@/components/admin/fields";
+import { loadJson } from "@/lib/admin/browser-store";
+import { defaultSiteSettings, type SiteSettings } from "@/lib/site-settings-data";
 
 export default function AdminSitePage() {
-	return (
-		<Suspense fallback={<AdminLoading />}>
-			<SiteContent />
-		</Suspense>
-	);
-}
+	const [settings, setSettings] = useState<SiteSettings | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
-async function SiteContent() {
-	await requireAdmin();
-	const settings = await getSiteSettings();
+	useEffect(() => {
+		let live = true;
+		loadJson("site-settings", defaultSiteSettings)
+			.then((stored) => {
+				if (!live) return;
+				setSettings({ ...defaultSiteSettings, ...stored, socials: { ...defaultSiteSettings.socials, ...stored.socials } });
+			})
+			.catch((reason: unknown) => {
+				if (live) setError(reason instanceof Error ? reason.message : "Couldn't load site settings.");
+			});
+		return () => {
+			live = false;
+		};
+	}, []);
+
+	if (error) return <p className="font-sans text-[13px] text-red-500">{error}</p>;
+	if (!settings) return <AdminLoading />;
 
 	return (
 		<div className="flex flex-col gap-4">

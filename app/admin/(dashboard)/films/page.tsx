@@ -1,24 +1,34 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { AdminLoading } from "@/components/admin/fields";
-import { FilmsEditor } from "@/components/admin/films-editor";
-import { requireAdmin } from "@/lib/admin/guard";
-import { listMedia } from "@/lib/admin/media";
-import { getFilms } from "@/lib/content";
+"use client";
 
-export const metadata: Metadata = { title: "Picture Work", robots: { index: false, follow: false } };
+import { useEffect, useState } from "react";
+import { FilmsEditor } from "@/components/admin/films-editor";
+import { AdminLoading } from "@/components/admin/fields";
+import { loadJson, loadUploads, type UploadItem } from "@/lib/admin/browser-store";
+import { defaultFilms, type Film } from "@/lib/content-data";
 
 export default function AdminFilmsPage() {
-	return (
-		<Suspense fallback={<AdminLoading />}>
-			<FilmsContent />
-		</Suspense>
-	);
-}
+	const [films, setFilms] = useState<Film[] | null>(null);
+	const [media, setMedia] = useState<UploadItem[] | null>(null);
+	const [error, setError] = useState<string | null>(null);
 
-async function FilmsContent() {
-	await requireAdmin();
-	const [films, media] = await Promise.all([getFilms(), listMedia()]);
+	useEffect(() => {
+		let live = true;
+		Promise.all([loadJson("films", defaultFilms), loadUploads()])
+			.then(([nextFilms, nextMedia]) => {
+				if (!live) return;
+				setFilms(nextFilms);
+				setMedia(nextMedia);
+			})
+			.catch((reason: unknown) => {
+				if (live) setError(reason instanceof Error ? reason.message : "Couldn't load picture work.");
+			});
+		return () => {
+			live = false;
+		};
+	}, []);
+
+	if (error) return <p className="font-sans text-[13px] text-red-500">{error}</p>;
+	if (!films || !media) return <AdminLoading />;
 
 	return (
 		<div className="flex flex-col gap-4">

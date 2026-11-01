@@ -1,47 +1,15 @@
-import "server-only";
 import { cacheTag } from "next/cache";
-import { readContent, writeContent } from "./content-store";
-import { site } from "./site";
+import { defaultSiteSettings, type SiteSettings } from "./site-settings-data";
 
-export type SocialLink = { label: string; handle: string; href: string };
-
-export type SiteSettings = {
-	name: string;
-	tagline: string;
-	availability: string;
-	location: string;
-	role: string;
-	whatsapp: string;
-	socials: {
-		github: SocialLink;
-		linkedin: SocialLink;
-		twitter: SocialLink;
-		youtube: SocialLink;
-		instagram: SocialLink;
-	};
-};
-
-export const defaultSiteSettings: SiteSettings = {
-	name: site.name,
-	tagline: site.tagline,
-	availability: site.availability,
-	location: site.location,
-	role: site.role,
-	whatsapp: "",
-	socials: {
-		github: { ...site.socials.github },
-		linkedin: { ...site.socials.linkedin },
-		twitter: { ...site.socials.twitter },
-		youtube: { ...site.socials.youtube },
-		instagram: { ...site.socials.instagram },
-	},
-};
+export type { SiteSettings, SocialLink } from "./site-settings-data";
+export { defaultSiteSettings } from "./site-settings-data";
 
 export async function getSiteSettings(): Promise<SiteSettings> {
 	"use cache";
 	cacheTag("content:site-settings");
 	// Merge over defaults (and merge `socials` one level deeper) so a settings file saved before a
 	// new field existed — e.g. before youtube/instagram were added — still gets a usable value for it.
+	const { readContent } = await import("./content-store");
 	const stored = await readContent<Partial<SiteSettings>>("site-settings", {});
 	return {
 		...defaultSiteSettings,
@@ -52,5 +20,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 export async function saveSiteSettings(next: SiteSettings): Promise<void> {
+	const { writeContent } = await import("./content-store");
 	await writeContent("site-settings", next);
 }

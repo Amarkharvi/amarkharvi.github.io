@@ -3,15 +3,15 @@
 import Image from "next/image";
 import { useState, useTransition } from "react";
 import { Icon } from "@/components/ui/icon";
-import type { MediaItem } from "@/lib/admin/media";
-import { deleteMediaAction } from "@/app/admin/(dashboard)/media/actions";
+import type { UploadItem } from "@/lib/admin/browser-store";
+import { removeUpload } from "@/lib/admin/browser-store";
 
 function formatSize(bytes: number) {
 	if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`;
 	return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
-export function MediaGrid({ items }: { items: MediaItem[] }) {
+export function MediaGrid({ items, onDeleted }: { items: UploadItem[]; onDeleted: () => void }) {
 	const [pendingName, setPendingName] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
 
@@ -55,7 +55,8 @@ export function MediaGrid({ items }: { items: MediaItem[] }) {
 										if (!window.confirm(`Delete ${item.name}? This can't be undone.`)) return;
 										setPendingName(item.name);
 										startTransition(async () => {
-											await deleteMediaAction(item.name);
+											await removeUpload(item.name);
+											onDeleted();
 										});
 									}}
 									title="Delete"

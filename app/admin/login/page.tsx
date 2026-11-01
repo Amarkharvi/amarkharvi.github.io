@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { connection } from "next/server";
 import { Icon } from "@/components/ui/icon";
-import { adminLoginStatus } from "@/lib/admin/session";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
@@ -23,36 +20,8 @@ export default function AdminLoginPage() {
 						<h1 className="font-headline text-headline-sm font-semibold text-on-surface">Admin sign in</h1>
 					</div>
 				</div>
-
-				<Suspense fallback={<p className="font-sans text-[13px] text-on-surface-variant">Checking setup…</p>}>
-					<LoginGate />
-				</Suspense>
+				<LoginForm />
 			</div>
 		</div>
-	);
-}
-
-async function LoginGate() {
-	// Read env on each request. A static prerender would freeze "not configured" into the page
-	// if the build ran before ADMIN_PASSWORD / ADMIN_SESSION_SECRET were set.
-	await connection();
-	const status = adminLoginStatus();
-
-	if (status === "ready") return <LoginForm />;
-
-	return (
-		<p className="rounded-lg bg-secondary-fixed px-3 py-2.5 font-sans text-[13px] text-on-secondary-fixed">
-			{status === "secret-too-short" ? (
-				<>
-					<code className="font-mono">ADMIN_SESSION_SECRET</code> is set, but it has to be at least 32 characters. Generate one with{" "}
-					<code className="font-mono">openssl rand -base64 48</code>, put it in <code className="font-mono">.env</code>, then restart the server.
-				</>
-			) : (
-				<>
-					Admin login isn&apos;t set up yet. Set <code className="font-mono">ADMIN_PASSWORD</code> and{" "}
-					<code className="font-mono">ADMIN_SESSION_SECRET</code> in <code className="font-mono">.env</code>, then restart the server.
-				</>
-			)}
-		</p>
 	);
 }

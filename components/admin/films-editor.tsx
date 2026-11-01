@@ -6,7 +6,7 @@ import { MediaPicker } from "@/components/admin/media-picker";
 import { Icon } from "@/components/ui/icon";
 import type { Film } from "@/lib/content";
 import type { MediaItem } from "@/lib/admin/media";
-import { saveFilmsAction, type FilmsFormState } from "@/app/admin/(dashboard)/films/actions";
+import { saveFilmsForm, type SaveState } from "@/lib/admin/browser-store";
 
 const badgeToneOptions = [
 	{ value: "secondary", label: "Secondary" },
@@ -39,11 +39,11 @@ function blankFilm(): Film {
 	};
 }
 
-const initialState: FilmsFormState = { error: null, saved: false };
+const initialState: SaveState = { error: null, saved: false };
 
 export function FilmsEditor({ initialFilms, media }: { initialFilms: Film[]; media: MediaItem[] }) {
 	const [films, setFilms] = useState<Film[]>(initialFilms);
-	const [state, action, pending] = useActionState(saveFilmsAction, initialState);
+	const [state, action, pending] = useActionState(saveFilmsForm, initialState);
 
 	function update(index: number, patch: Partial<Film>) {
 		setFilms((prev) => prev.map((film, i) => (i === index ? { ...film, ...patch } : film)));

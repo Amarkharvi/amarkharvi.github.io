@@ -1,10 +1,10 @@
 // Builds a static export for GitHub Pages (no Node server there — see the GitHub Actions
 // workflow at .github/workflows/github-pages.yml).
 //
-// `/admin` and `/api/*` both need a real server: the admin pages read and write cookies and run
-// Server Actions, and the API routes handle POSTed requests. None of that works in a static
-// export, so this script moves both directories out of `app/` before the build and always moves
-// them back afterward, even if the build fails.
+// The public pages and the admin UI are both exported. Admin saves from the hosted site go
+// through the GitHub API in the browser. `/api/*` and the `"use server"` action files still need
+// a Node server (cookies, filesystem), so this script moves them aside for the build and always
+// moves them back, even if the build fails.
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,24 +14,40 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const appDir = join(root, "app");
 const stashDir = join(root, ".static-export-stash");
 
+const actionFiles = [
+	"app/admin/(dashboard)/about/actions.ts",
+	"app/admin/(dashboard)/films/actions.ts",
+	"app/admin/(dashboard)/media/actions.ts",
+	"app/admin/(dashboard)/products/actions.ts",
+	"app/admin/(dashboard)/site/actions.ts",
+	"app/admin/(dashboard)/stack/actions.ts",
+];
+
 const moves = [
-	{ from: join(appDir, "admin"), to: join(stashDir, "admin") },
 	{ from: join(appDir, "api"), to: join(stashDir, "api") },
-	// `components/admin/*` only imports from `app/admin/*` (Server Actions) and isn't imported by
-	// anything outside `app/admin/*` — stash it too, or `tsc` fails on the now-missing imports.
-	{ from: join(root, "components", "admin"), to: join(stashDir, "components-admin") },
+	...actionFiles.map((file) => ({ from: join(root, file), to: join(stashDir, file) })),
 ];
 
 function stash() {
 	mkdirSync(stashDir, { recursive: true });
 	for (const { from, to } of moves) {
-		if (existsSync(from)) renameSync(from, to);
+		if (!existsSync(from)) continue;
+		if (existsSync(to)) rmSync(to, { recursive: true, force: true });
+		mkdirSync(dirname(to), { recursive: true });
+		renameSync(from, to);
 	}
 }
 
 function restore() {
 	for (const { from, to } of moves) {
-		if (existsSync(to)) renameSync(to, from);
+		if (!existsSync(to)) continue;
+		// A previous interrupted build can leave both copies. Keep the live tree.
+		if (existsSync(from)) {
+			rmSync(to, { recursive: true, force: true });
+			continue;
+		}
+		mkdirSync(dirname(from), { recursive: true });
+		renameSync(to, from);
 	}
 }
 
@@ -61,14 +77,17 @@ function restoreCacheDirectives() {
 	}
 }
 
-stash();
-stripUseCacheDirectives();
-// A leftover `.next/dev/types/*` from a prior `next dev` run still references the now-moved admin
-// and API routes, and `tsc` checks it because tsconfig.json includes it — clean it so this build
-// generates its own types for the routes that actually remain.
-rmSync(join(root, ".next"), { recursive: true, force: true });
 let result;
 try {
+	stash();
+	stripUseCacheDirectives();
+	// A leftover `.next/dev/types/*` from a prior `next dev` run still references routes this build
+	// moves aside, and `tsc` checks it because tsconfig.json includes it.
+	try {
+		rmSync(join(root, ".next"), { recursive: true, force: true, maxRetries: 3 });
+	} catch (error) {
+		console.warn("Could not clear .next before the static build:", error instanceof Error ? error.message : error);
+	}
 	result = spawnSync("npx", ["next", "build"], {
 		cwd: root,
 		stdio: "inherit",

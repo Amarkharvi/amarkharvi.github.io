@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { IS_STATIC_SITE } from "@/lib/is-static";
 
 const inputClass = "rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 font-mono text-[12px] text-on-surface outline-none focus:border-primary";
 
@@ -71,7 +72,13 @@ export function SaveBar({ pending, saved, error }: { pending: boolean; saved: bo
 	return (
 		<div className="sticky bottom-4 z-10 flex items-center justify-between gap-3 rounded-full bg-surface-container-high px-4 py-2 shadow-lg dark:border dark:border-primary/20">
 			<span className="font-sans text-[12px] text-on-surface-variant">
-				{error ? <span className="text-red-500">{error}</span> : saved ? "Saved — live on the site." : "Edit, then save."}
+				{error ? (
+					<span className="text-red-500">{error}</span>
+				) : saved ? (
+					IS_STATIC_SITE ? "Saved to GitHub. The site rebuilds in about a minute." : "Saved — live on the site."
+				) : (
+					"Edit, then save."
+				)}
 			</span>
 			<button
 				type="submit"

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/cn";
-import { logoutAction } from "@/app/admin/login/actions";
+import { signOut } from "@/lib/admin/browser-store";
 
 const sections = [
 	{ href: "/admin", label: "Dashboard", icon: "dashboard" },
@@ -18,6 +18,7 @@ const sections = [
 
 export function AdminNav() {
 	const pathname = usePathname();
+	const router = useRouter();
 
 	return (
 		<header className="sticky top-0 z-40 flex flex-col gap-2 border-b border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-xl md:px-6">
@@ -33,12 +34,17 @@ export function AdminNav() {
 						<Icon name="open_in_new" className="text-[14px]" />
 						View site
 					</Link>
-					<form action={logoutAction}>
-						<button type="submit" className="flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 font-sans text-label-pill font-bold text-on-surface-variant transition-colors hover:text-on-surface">
-							<Icon name="logout" className="text-[14px]" />
-							Sign out
-						</button>
-					</form>
+					<button
+						type="button"
+						onClick={async () => {
+							await signOut();
+							router.push("/admin/login");
+						}}
+						className="flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 font-sans text-label-pill font-bold text-on-surface-variant transition-colors hover:text-on-surface"
+					>
+						<Icon name="logout" className="text-[14px]" />
+						Sign out
+					</button>
 				</div>
 			</div>
 			<nav aria-label="Admin sections" className="-mx-1 flex gap-1 overflow-x-auto pb-1">

@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { Field, SaveBar, SelectField } from "@/components/admin/fields";
 import { Icon } from "@/components/ui/icon";
 import type { TechStackItem } from "@/lib/content";
-import { saveTechStackAction, type StackFormState } from "@/app/admin/(dashboard)/stack/actions";
+import { saveTechStackForm, type SaveState } from "@/lib/admin/browser-store";
 
 const dotOptions = [
 	"bg-primary",
@@ -23,11 +23,11 @@ const groupOptions = [
 	{ value: "server", label: "Server" },
 ];
 
-const initialState: StackFormState = { error: null, saved: false };
+const initialState: SaveState = { error: null, saved: false };
 
 export function TechStackEditor({ initialItems }: { initialItems: TechStackItem[] }) {
 	const [items, setItems] = useState<TechStackItem[]>(initialItems);
-	const [state, action, pending] = useActionState(saveTechStackAction, initialState);
+	const [state, action, pending] = useActionState(saveTechStackForm, initialState);
 
 	function update(index: number, patch: Partial<TechStackItem>) {
 		setItems((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));

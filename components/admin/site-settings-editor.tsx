@@ -4,13 +4,13 @@ import { useActionState, useState } from "react";
 import { Card, Field } from "@/components/admin/fields";
 import { SaveBar } from "@/components/admin/fields";
 import type { SiteSettings, SocialLink } from "@/lib/site-settings";
-import { saveSiteSettingsAction, type SiteFormState } from "@/app/admin/(dashboard)/site/actions";
+import { saveSiteForm, type SaveState } from "@/lib/admin/browser-store";
 
-const initialState: SiteFormState = { error: null, saved: false };
+const initialState: SaveState = { error: null, saved: false };
 
 export function SiteSettingsEditor({ initialSettings }: { initialSettings: SiteSettings }) {
 	const [settings, setSettings] = useState<SiteSettings>(initialSettings);
-	const [state, action, pending] = useActionState(saveSiteSettingsAction, initialState);
+	const [state, action, pending] = useActionState(saveSiteForm, initialState);
 
 	function updateSocial(key: keyof SiteSettings["socials"], patch: Partial<SocialLink>) {
 		setSettings((prev) => ({ ...prev, socials: { ...prev.socials, [key]: { ...prev.socials[key], ...patch } } }));

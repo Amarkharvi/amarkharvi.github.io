@@ -1,30 +1,55 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
-import { loginAction, type LoginState } from "./actions";
-
-const initialState: LoginState = { error: null };
+import { signIn } from "@/lib/admin/browser-store";
+import { IS_STATIC_SITE } from "@/lib/is-static";
 
 export function LoginForm() {
-	const [state, action, pending] = useActionState(loginAction, initialState);
+	const router = useRouter();
+	const [pending, setPending] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	async function onSubmit(event: FormEvent<HTMLFormElement>) {
+		event.preventDefault();
+		const secret = String(new FormData(event.currentTarget).get("secret") ?? "");
+		setPending(true);
+		setError(null);
+		const message = await signIn(secret);
+		setPending(false);
+		if (message) {
+			setError(message);
+			return;
+		}
+		router.push("/admin");
+	}
 
 	return (
-		<form action={action} className="flex flex-col gap-4">
+		<form onSubmit={onSubmit} className="flex flex-col gap-4">
 			<label className="flex flex-col gap-1.5">
-				<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Admin password</span>
+				<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">
+					{IS_STATIC_SITE ? "GitHub token" : "Admin password"}
+				</span>
 				<input
 					type="password"
-					name="password"
+					name="secret"
 					required
 					autoFocus
 					autoComplete="current-password"
+					placeholder={IS_STATIC_SITE ? "github_pat_…" : undefined}
 					className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3.5 py-2.5 font-mono text-[14px] text-on-surface outline-none focus:border-primary"
 				/>
 			</label>
-			{state.error ? (
+			{IS_STATIC_SITE ? (
+				<p className="font-sans text-[12px] leading-relaxed text-on-surface-variant">
+					This hosted admin has no server. A fine-grained GitHub token with Contents access to{" "}
+					<code className="font-mono">Amarkharvi/amarkharvi.github.io</code> saves edits by committing them. It stays in this browser tab.
+				</p>
+			) : null}
+			{error ? (
 				<p role="alert" className="rounded-lg bg-secondary-fixed px-3 py-2 font-sans text-[13px] text-on-secondary-fixed">
-					{state.error}
+					{error}
 				</p>
 			) : null}
 			<button

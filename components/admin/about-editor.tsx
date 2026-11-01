@@ -5,13 +5,13 @@ import { Card, Field, SaveBar } from "@/components/admin/fields";
 import { MediaPicker } from "@/components/admin/media-picker";
 import type { MediaItem } from "@/lib/admin/media";
 import type { AboutContent } from "@/lib/about";
-import { saveAboutContentAction, type AboutFormState } from "@/app/admin/(dashboard)/about/actions";
+import { saveAboutForm, type SaveState } from "@/lib/admin/browser-store";
 
-const initialState: AboutFormState = { error: null, saved: false };
+const initialState: SaveState = { error: null, saved: false };
 
 export function AboutEditor({ initialContent, media }: { initialContent: AboutContent; media: MediaItem[] }) {
 	const [about, setAbout] = useState<AboutContent>(initialContent);
-	const [state, action, pending] = useActionState(saveAboutContentAction, initialState);
+	const [state, action, pending] = useActionState(saveAboutForm, initialState);
 
 	function update(patch: Partial<AboutContent>) {
 		setAbout((prev) => ({ ...prev, ...patch }));

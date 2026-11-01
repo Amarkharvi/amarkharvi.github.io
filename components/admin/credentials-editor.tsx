@@ -4,9 +4,9 @@ import { useActionState, useState } from "react";
 import { Card, Field, SaveBar } from "@/components/admin/fields";
 import { Icon } from "@/components/ui/icon";
 import type { Credential, Credentials } from "@/lib/content";
-import { saveCredentialsAction, type StackFormState } from "@/app/admin/(dashboard)/stack/actions";
+import { saveCredentialsForm, type SaveState } from "@/lib/admin/browser-store";
 
-const initialState: StackFormState = { error: null, saved: false };
+const initialState: SaveState = { error: null, saved: false };
 
 function blankCredential(): Credential {
 	return { icon: "star", title: "New credential", body: "" };
@@ -54,7 +54,7 @@ function Group({
 
 export function CredentialsEditor({ initialCredentials }: { initialCredentials: Credentials }) {
 	const [data, setData] = useState<Credentials>(initialCredentials);
-	const [state, action, pending] = useActionState(saveCredentialsAction, initialState);
+	const [state, action, pending] = useActionState(saveCredentialsForm, initialState);
 
 	return (
 		<form action={action} className="flex flex-col gap-4 pb-24">

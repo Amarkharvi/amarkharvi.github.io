@@ -106,20 +106,20 @@ Products and prices live in `lib/products.ts` (prices in paise). The files you s
 
 ## Static export (GitHub Pages)
 
-GitHub Pages only serves static files — there's no server to run `/admin` (cookies, Server Actions) or the API routes (`/api/*`). `.github/workflows/github-pages.yml` builds a GitHub Pages–only subset with those left out:
+GitHub Pages only serves static files. `.github/workflows/github-pages.yml` builds that export. `/admin` is included: sign-in is a GitHub token kept in the browser, and saves commit JSON back to this repo, which triggers a rebuild. `/api/*` still needs a Node server, so it is left out of the export:
 
 ```bash
 npm run build:static   # writes ./out
 ```
 
-`scripts/build-static.mjs` moves `app/admin`, `app/api`, and `components/admin` out of the way for the duration of the build (and always moves them back, even if the build fails), and temporarily strips the `"use cache"`/`cacheTag` calls from `lib/{about,content,products,site-settings}.ts` — that directive needs `cacheComponents`, which can't be combined with `output: "export"`. The functions just run once as plain `async` calls instead, which is all a one-shot static build needs anyway. `next.config.ts` switches to `output: "export"` and an unoptimized image loader when `STATIC_EXPORT=1`.
+`scripts/build-static.mjs` moves `app/api` and the admin Server Action files aside for the build (and always moves them back), and temporarily strips the `"use cache"`/`cacheTag` calls from `lib/{about,content,products,site-settings}.ts`. `next.config.ts` switches to `output: "export"` when `STATIC_EXPORT=1`.
 
 Two things degrade on purpose, since there's no server to send a form to:
 
 - The About page's inquiry forms show a message pointing at GitHub/LinkedIn/X instead of submitting.
 - The Lab page's papers terminal skips the email step and downloads the PDF directly.
 
-The LUT shop's "Order on WhatsApp" button needs no API either way, so it's unaffected. The admin-edited `content/*.json` files are gitignored, so the export always bakes in the defaults from `lib/*.ts` — there's no live editing on this build.
+The LUT shop's "Order on WhatsApp" button needs no API either way, so it's unaffected. On GitHub Pages, admin saves commit `content/*.json` (and uploads) to `main`. The next Pages build reads those files, so the public site updates after the workflow finishes. Locally, `npm run dev` still signs in with `ADMIN_PASSWORD` and writes the JSON on this machine.
 
 For the full app — admin, the inquiry API, everything — deploy to a host that runs a Node server (e.g. Vercel) with `npm run build` / `npm start`, same as before.
 

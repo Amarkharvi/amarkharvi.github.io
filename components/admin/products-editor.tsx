@@ -5,9 +5,9 @@ import { Card, Field, SaveBar } from "@/components/admin/fields";
 import { MediaPicker } from "@/components/admin/media-picker";
 import type { MediaItem } from "@/lib/admin/media";
 import type { Product } from "@/lib/products";
-import { saveProductsAction, type ProductsFormState } from "@/app/admin/(dashboard)/products/actions";
+import { saveProductsForm, type SaveState } from "@/lib/admin/browser-store";
 
-const initialState: ProductsFormState = { error: null, saved: false };
+const initialState: SaveState = { error: null, saved: false };
 
 function toRupees(paise: number | undefined) {
 	return typeof paise === "number" ? String(paise / 100) : "";
@@ -20,7 +20,7 @@ function toPaise(rupees: string): number {
 
 export function ProductsEditor({ initialProducts, media }: { initialProducts: Product[]; media: MediaItem[] }) {
 	const [products, setProducts] = useState<Product[]>(initialProducts);
-	const [state, action, pending] = useActionState(saveProductsAction, initialState);
+	const [state, action, pending] = useActionState(saveProductsForm, initialState);
 
 	function update(index: number, patch: Partial<Product>) {
 		setProducts((prev) => prev.map((product, i) => (i === index ? { ...product, ...patch } : product)));
