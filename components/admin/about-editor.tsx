@@ -3,13 +3,12 @@
 import { useActionState, useState } from "react";
 import { Card, Field, SaveBar } from "@/components/admin/fields";
 import { MediaPicker } from "@/components/admin/media-picker";
-import type { MediaItem } from "@/lib/admin/media";
 import type { AboutContent } from "@/lib/about";
-import { saveAboutForm, type SaveState } from "@/lib/admin/browser-store";
+import { saveAboutForm, type SaveState, type UploadItem } from "@/lib/admin/browser-store";
 
 const initialState: SaveState = { error: null, saved: false };
 
-export function AboutEditor({ initialContent, media }: { initialContent: AboutContent; media: MediaItem[] }) {
+export function AboutEditor({ initialContent, media }: { initialContent: AboutContent; media: UploadItem[] }) {
 	const [about, setAbout] = useState<AboutContent>(initialContent);
 	const [state, action, pending] = useActionState(saveAboutForm, initialState);
 

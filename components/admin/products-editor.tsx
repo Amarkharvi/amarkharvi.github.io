@@ -3,9 +3,8 @@
 import { useActionState, useState } from "react";
 import { Card, Field, SaveBar } from "@/components/admin/fields";
 import { MediaPicker } from "@/components/admin/media-picker";
-import type { MediaItem } from "@/lib/admin/media";
 import type { Product } from "@/lib/products";
-import { saveProductsForm, type SaveState } from "@/lib/admin/browser-store";
+import { saveProductsForm, type SaveState, type UploadItem } from "@/lib/admin/browser-store";
 
 const initialState: SaveState = { error: null, saved: false };
 
@@ -18,7 +17,7 @@ function toPaise(rupees: string): number {
 	return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
-export function ProductsEditor({ initialProducts, media }: { initialProducts: Product[]; media: MediaItem[] }) {
+export function ProductsEditor({ initialProducts, media }: { initialProducts: Product[]; media: UploadItem[] }) {
 	const [products, setProducts] = useState<Product[]>(initialProducts);
 	const [state, action, pending] = useActionState(saveProductsForm, initialState);
 

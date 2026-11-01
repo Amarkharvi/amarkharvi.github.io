@@ -6,7 +6,7 @@ const REPO = "Amarkharvi/amarkharvi.github.io";
 const BRANCH = "main";
 const TOKEN_KEY = "dp_github_token";
 
-export type UploadItem = { name: string; url: string; kind: "image" | "video"; size: number; uploadedAt: string };
+export type UploadItem = { name: string; url: string; previewUrl?: string; kind: "image" | "video"; size: number; uploadedAt: string };
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"]);
 const VIDEO_EXT = new Set([".mp4", ".webm", ".mov"]);
@@ -109,6 +109,13 @@ export async function githubWriteJson(path: string, data: unknown, message: stri
 	if (!res.ok) throw new Error(await githubError(res));
 }
 
+// GitHub Pages serves `/media/uploads/*` only after the static build finishes. The commit is
+// available on raw.githubusercontent.com immediately, so the admin preview uses that while the
+// value saved into content stays the site path.
+function previewUrlFor(name: string): string {
+	return `https://raw.githubusercontent.com/${REPO}/${BRANCH}/public/media/uploads/${encodeURIComponent(name)}`;
+}
+
 function kindOf(name: string): UploadItem["kind"] | null {
 	const ext = name.slice(name.lastIndexOf(".")).toLowerCase();
 	if (IMAGE_EXT.has(ext)) return "image";
@@ -121,13 +128,13 @@ export async function githubListUploads(): Promise<UploadItem[]> {
 	const listing = await getContent("public/media/uploads", token);
 	if (!listing) return [];
 	const entries = Array.isArray(listing) ? listing : [];
-	return entries
-		.map((entry) => {
-			const kind = kindOf(entry.name ?? "");
-			if (!kind || !entry.name || entry.name === ".gitkeep") return null;
-			return { name: entry.name, url: `/media/uploads/${entry.name}`, kind, size: entry.size ?? 0, uploadedAt: "" } satisfies UploadItem;
-		})
-		.filter((item): item is UploadItem => item !== null);
+	const items: UploadItem[] = [];
+	for (const entry of entries) {
+		const kind = kindOf(entry.name ?? "");
+		if (!kind || !entry.name || entry.name === ".gitkeep") continue;
+		items.push({ name: entry.name, url: `/media/uploads/${entry.name}`, previewUrl: previewUrlFor(entry.name), kind, size: entry.size ?? 0, uploadedAt: "" });
+	}
+	return items;
 }
 
 export async function githubUpload(file: File): Promise<void> {

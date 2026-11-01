@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
   cacheComponents: !isStaticExport,
   images: {
     qualities: [75, 90],
+    // Admin thumbnails on the static site load from the commit directly. The public pages keep
+    // using `/media/uploads/...`, which exists only after GitHub Pages rebuilds.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        pathname: "/Amarkharvi/amarkharvi.github.io/**",
+      },
+    ],
     ...(isStaticExport ? { unoptimized: true } : {}),
   },
   ...(isStaticExport

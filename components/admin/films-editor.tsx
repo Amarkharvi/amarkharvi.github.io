@@ -5,8 +5,7 @@ import { Card, Field, SaveBar, SelectField } from "@/components/admin/fields";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { Icon } from "@/components/ui/icon";
 import type { Film } from "@/lib/content";
-import type { MediaItem } from "@/lib/admin/media";
-import { saveFilmsForm, type SaveState } from "@/lib/admin/browser-store";
+import { saveFilmsForm, type SaveState, type UploadItem } from "@/lib/admin/browser-store";
 
 const badgeToneOptions = [
 	{ value: "secondary", label: "Secondary" },
@@ -41,7 +40,7 @@ function blankFilm(): Film {
 
 const initialState: SaveState = { error: null, saved: false };
 
-export function FilmsEditor({ initialFilms, media }: { initialFilms: Film[]; media: MediaItem[] }) {
+export function FilmsEditor({ initialFilms, media }: { initialFilms: Film[]; media: UploadItem[] }) {
 	const [films, setFilms] = useState<Film[]>(initialFilms);
 	const [state, action, pending] = useActionState(saveFilmsForm, initialState);
 

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
-import type { MediaItem } from "@/lib/admin/media";
+import type { UploadItem } from "@/lib/admin/browser-store";
 import { cn } from "@/lib/cn";
 
 const VIDEO_PATTERN = /\.(mp4|webm|mov)$/i;
@@ -18,11 +18,13 @@ export function MediaPicker({
 	label: string;
 	value: string;
 	onChange: (value: string) => void;
-	media: MediaItem[];
+	media: UploadItem[];
 	className?: string;
 }) {
 	const [open, setOpen] = useState(false);
 	const isVideo = VIDEO_PATTERN.test(value);
+	const selected = media.find((item) => item.url === value);
+	const preview = selected?.previewUrl ?? value;
 
 	return (
 		<div className={cn("flex flex-col gap-1.5", className)}>
@@ -46,9 +48,9 @@ export function MediaPicker({
 			{value ? (
 				<div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-surface-container">
 					{isVideo ? (
-						<video src={value} muted className="h-full w-full object-cover" />
+						<video src={preview} muted className="h-full w-full object-cover" />
 					) : (
-						<Image src={value} alt="" fill sizes="128px" className="object-cover" />
+						<Image src={preview} alt="" fill sizes="128px" className="object-cover" unoptimized />
 					)}
 				</div>
 			) : null}
@@ -79,7 +81,7 @@ export function MediaPicker({
 									)}
 								>
 									{item.kind === "image" ? (
-										<Image src={item.url} alt={item.name} fill sizes="80px" className="object-cover" />
+										<Image src={item.previewUrl ?? item.url} alt={item.name} fill sizes="80px" className="object-cover" unoptimized />
 									) : (
 										<span className="flex h-full w-full items-center justify-center bg-inverse-surface text-inverse-on-surface">
 											<Icon name="movie" className="text-[20px]" />

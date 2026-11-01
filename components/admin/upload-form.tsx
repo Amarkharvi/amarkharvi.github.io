@@ -52,7 +52,7 @@ export function UploadForm({ onUploaded }: { onUploaded: () => void }) {
 			</div>
 			<p className="font-mono text-[11px] text-on-surface-variant">
 				{IS_STATIC_SITE
-					? "Images or short video, up to 4.5MB. The upload is committed to GitHub and shows up after the site rebuilds."
+					? "Images or short video, up to 4.5MB. The library shows it right away. Public pages pick it up after the site rebuilds."
 					: "Images (jpg, png, webp, gif, avif) or video (mp4, webm, mov), up to 80MB."}
 			</p>
 			{error ? (
