@@ -5,6 +5,14 @@
 	"location": "Bengaluru • Remote",
 	"role": "Full-stack & Cinema",
 	"whatsapp": "+919110819846",
+	"introHeading": "Light in the frame,",
+	"introSubheading": "logic in the stack.",
+	"introParagraph": "I am Amar Kharvi. One side of me shoots and cuts for YouTube and Instagram. The other builds full-stack products. Pick a side, or take both.",
+	"swipe": {
+		"reel": "/media/work/quiet-moments-train.png",
+		"product": "/media/cinema/neon-monolith-cover.jpg",
+		"portrait": "/media/uploads/4dc4267d-e08e-418e-a36c-0d6564605df4-1793635681762.jpg"
+	},
 	"reel": {
 		"video": "/media/uploads/VN20261101_205723-1793548034988-2c7eaea8.mp4",
 		"poster": "/media/uploads/Screenshot-2026-11-01-at-9-22-01-PM-1793548356383-c06fb17c.png"
