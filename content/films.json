@@ -1,0 +1,131 @@
+[
+	{
+		"slug": "instagram-reels",
+		"index": "01",
+		"title": "YouTube & Reels",
+		"badge": "Edits",
+		"badgeTone": "secondary",
+		"stock": "Vertical & widescreen cuts",
+		"credit": "Edit • Pace • Sound • Captions",
+		"cover": "/media/cinema/quiet-moments-cover.jpg",
+		"focal": "CUT: Hook inside the first second",
+		"specs": [
+			{
+				"label": "Frame",
+				"value": "9:16 feed & 16:9 masters"
+			},
+			{
+				"label": "Delivery",
+				"value": "YouTube and Instagram"
+			}
+		],
+		"note": "Longer cuts go to YouTube. The reel cut is for Instagram: a clear opening image, a rhythm that matches the track, and an end card that still reads on a phone.",
+		"stills": [
+			{
+				"src": "/media/cinema/quiet-moments-hands.jpg",
+				"alt": "Close detail frame used as a reel cutaway"
+			},
+			{
+				"src": "/media/cinema/quiet-moments-roofs.jpg",
+				"alt": "Wide frame held for a slower beat in an edit"
+			}
+		],
+		"studyHref": "/cinema/quiet-moments"
+	},
+	{
+		"slug": "product-shoots",
+		"index": "02",
+		"title": "Product Shoots",
+		"badge": "Still & motion",
+		"badgeTone": "primary",
+		"stock": "Tabletop and lifestyle",
+		"credit": "Product photography & short clips",
+		"cover": "/media/cinema/neon-monolith-cover.jpg",
+		"focal": "LIGHT: Shape the object, then the background",
+		"specs": [
+			{
+				"label": "Setup",
+				"value": "Tabletop, lifestyle, or on location"
+			},
+			{
+				"label": "Delivery",
+				"value": "Stills plus a short motion cut"
+			}
+		],
+		"note": "Product work stays on the object: clean edges, honest color, and a clip short enough to drop into a reel or a product page.",
+		"stills": [
+			{
+				"src": "/media/cinema/neon-monolith-chrome.jpg",
+				"alt": "Reflective surface used as a product-light reference"
+			},
+			{
+				"src": "/media/cinema/neon-monolith-runner.jpg",
+				"alt": "Motion frame with a strong backlight"
+			}
+		]
+	},
+	{
+		"slug": "portraits",
+		"index": "03",
+		"title": "Portraits",
+		"badge": "People",
+		"badgeTone": "warm",
+		"stock": "Natural Outdoor",
+		"credit": "Headshots, lifestyle, and character frames",
+		"cover": "/media/uploads/4dc4267d-e08e-418e-a36c-0d6564605df4-1793635681762.jpg",
+		"focal": "LIGHT: Face first, background second",
+		"specs": [
+			{
+				"label": "Light",
+				"value": "Window, soft key, or open shade"
+			},
+			{
+				"label": "Use",
+				"value": "Profiles, campaigns, personal sets"
+			}
+		],
+		"note": "Portraits are about the person in the frame: a readable face, a background that stays quiet, and a grade that doesn't repaint skin.",
+		"stills": [
+			{
+				"src": "/media/cinema/symphony-of-rust-chain.jpg",
+				"alt": "Texture close-up kept as a portrait detail reference"
+			},
+			{
+				"src": "/media/cinema/symphony-of-rust-dockworker.jpg",
+				"alt": "Figure framed against a simple evening background"
+			}
+		]
+	},
+	{
+		"slug": "grade-and-cut",
+		"index": "04",
+		"title": "Grade & Cut",
+		"badge": "Finish",
+		"badgeTone": "neutral",
+		"stock": "Color, pace, and export",
+		"credit": "The pass after the shoot",
+		"cover": "/media/cinema/threshold-cover.jpg",
+		"focal": "FINISH: One look across stills and the reel",
+		"specs": [
+			{
+				"label": "Grade",
+				"value": "Matched stills and motion"
+			},
+			{
+				"label": "Export",
+				"value": "Feed file and a client master"
+			}
+		],
+		"note": "The finish is where a shoot becomes a reel: trim in Premiere Pro or DaVinci Resolve, match the stills in Lightroom, then export a file that holds up on a phone and on a page.",
+		"stills": [
+			{
+				"src": "/media/cinema/threshold-dancer.jpg",
+				"alt": "Motion frame from a grade reference"
+			},
+			{
+				"src": "/media/cinema/threshold-piano.jpg",
+				"alt": "Low-key still used to check contrast in the grade"
+			}
+		]
+	}
+]
