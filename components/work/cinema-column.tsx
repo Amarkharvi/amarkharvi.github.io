@@ -6,12 +6,6 @@ import { ColumnHeading } from "./column-heading";
 
 const chapters = ["Product films", "Portraits", "Grade & cut"];
 
-const feed = [
-	{ label: "Reel", href: "/cinema/quiet-moments", src: "/media/work/quiet-moments-train.png", alt: "Window-light reel cover" },
-	{ label: "Product", href: "/cinema#product-shoots", src: "/media/cinema/neon-monolith-cover.jpg", alt: "Reflective product-light frame" },
-	{ label: "Portrait", href: "/cinema#portraits", src: "/media/cinema/symphony-of-rust-cover.jpg", alt: "Evening portrait frame" },
-];
-
 const editBay = [
 	{ tool: "Lightroom", use: "Stills: product and portraits", icon: "photo_camera" },
 	{ tool: "DaVinci Resolve", use: "Cut, color, and finish", icon: "palette" },
@@ -22,6 +16,11 @@ const card = "overflow-hidden rounded-xl bg-surface-container-lowest shadow-card
 
 export async function CinemaColumn() {
 	const settings = await getSiteSettings();
+	const feed = [
+		{ label: "Reel", href: "/cinema/quiet-moments", src: settings.swipe.reel, alt: "Window-light reel cover" },
+		{ label: "Product", href: "/cinema#product-shoots", src: settings.swipe.product, alt: "Reflective product-light frame" },
+		{ label: "Portrait", href: "/cinema#portraits", src: settings.swipe.portrait, alt: "Evening portrait frame" },
+	];
 	return (
 		<section aria-label="Cinematography" className="flex flex-col gap-5">
 			<ColumnHeading icon="movie" eyebrow="Persona 01 // Cinematographer" title="The frame" serif iconClassName="bg-secondary text-on-secondary" />

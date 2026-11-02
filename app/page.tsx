@@ -37,14 +37,13 @@ export default async function WorkPage() {
 						<span className="font-mono text-[11px] text-outline">CINEMA × CODE</span>
 					</div>
 					<h1 className="max-w-4xl font-serif text-display-hero-mobile tracking-tight text-on-surface md:text-display-hero">
-						Light in the frame, <br />
+						{settings.introHeading} <br />
 						<span className="bg-linear-to-r from-secondary via-secondary-container to-primary-container bg-clip-text font-headline font-bold not-italic text-transparent dark:from-primary dark:via-tertiary-fixed dark:to-primary-fixed-dim">
-							logic in the stack.
+							{settings.introSubheading}
 						</span>
 					</h1>
 					<p className="max-w-2xl font-serif text-body-editorial text-on-surface-variant">
-						I am Amar Kharvi. One side of me shoots and cuts for YouTube and Instagram. The other builds full-stack products. Pick a side, or
-						take both.
+						{settings.introParagraph}
 					</p>
 				</div>
 			</Reveal>

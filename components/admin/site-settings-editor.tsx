@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { Card, Field } from "@/components/admin/fields";
 import { SaveBar } from "@/components/admin/fields";
 import { MediaPicker } from "@/components/admin/media-picker";
-import type { ReelSettings, SiteSettings, SocialLink } from "@/lib/site-settings";
+import type { ReelSettings, SiteSettings, SocialLink, SwipeImages } from "@/lib/site-settings";
 import { saveSiteForm, type SaveState, type UploadItem } from "@/lib/admin/browser-store";
 
 const initialState: SaveState = { error: null, saved: false };
@@ -19,6 +19,10 @@ export function SiteSettingsEditor({ initialSettings, media }: { initialSettings
 
 	function updateReel(patch: Partial<ReelSettings>) {
 		setSettings((prev) => ({ ...prev, reel: { ...prev.reel, ...patch } }));
+	}
+
+	function updateSwipe(patch: Partial<SwipeImages>) {
+		setSettings((prev) => ({ ...prev, swipe: { ...prev.swipe, ...patch } }));
 	}
 
 	return (
@@ -43,6 +47,45 @@ export function SiteSettingsEditor({ initialSettings, media }: { initialSettings
 				<p className="font-sans text-[12px] text-on-surface-variant">
 					Country code plus number, no spaces. LUT orders on the shop open a WhatsApp chat to this number.
 				</p>
+			</Card>
+
+			<Card>
+				<div>
+					<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Intro phrase</span>
+					<p className="font-sans text-[12px] text-on-surface-variant">The hero heading and sub-copy on the Dual Persona home page.</p>
+				</div>
+				<div className="grid gap-3">
+					<Field
+						label="Heading — line 1 (plain serif)"
+						value={settings.introHeading}
+						onChange={(value) => setSettings((prev) => ({ ...prev, introHeading: value }))}
+					/>
+					<Field
+						label="Heading — line 2 (gradient style)"
+						value={settings.introSubheading}
+						onChange={(value) => setSettings((prev) => ({ ...prev, introSubheading: value }))}
+					/>
+					<Field
+						label="Paragraph"
+						value={settings.introParagraph}
+						as="textarea"
+						onChange={(value) => setSettings((prev) => ({ ...prev, introParagraph: value }))}
+					/>
+				</div>
+			</Card>
+
+			<Card>
+				<div>
+					<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">The swipe — Instagram grid</span>
+					<p className="font-sans text-[12px] text-on-surface-variant">
+						The three thumbnail images shown in the &quot;The swipe&quot; card on the Dual Persona page. Upload images in the Media Library first, then pick them here.
+					</p>
+				</div>
+				<div className="grid gap-3 md:grid-cols-3">
+					<MediaPicker label="Reel thumbnail" value={settings.swipe.reel} onChange={(value) => updateSwipe({ reel: value })} media={media} />
+					<MediaPicker label="Product thumbnail" value={settings.swipe.product} onChange={(value) => updateSwipe({ product: value })} media={media} />
+					<MediaPicker label="Portrait thumbnail" value={settings.swipe.portrait} onChange={(value) => updateSwipe({ portrait: value })} media={media} />
+				</div>
 			</Card>
 
 			<Card>
@@ -88,3 +131,4 @@ export function SiteSettingsEditor({ initialSettings, media }: { initialSettings
 		</form>
 	);
 }
+

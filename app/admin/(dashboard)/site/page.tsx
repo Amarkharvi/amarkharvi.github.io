@@ -19,6 +19,10 @@ export default function AdminSitePage() {
 				setSettings({
 					...defaultSiteSettings,
 					...stored,
+					introHeading: stored.introHeading ?? defaultSiteSettings.introHeading,
+					introSubheading: stored.introSubheading ?? defaultSiteSettings.introSubheading,
+					introParagraph: stored.introParagraph ?? defaultSiteSettings.introParagraph,
+					swipe: { ...defaultSiteSettings.swipe, ...stored.swipe },
 					reel: { ...defaultSiteSettings.reel, ...stored.reel },
 					socials: { ...defaultSiteSettings.socials, ...stored.socials },
 				});

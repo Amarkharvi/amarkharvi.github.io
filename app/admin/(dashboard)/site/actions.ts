@@ -18,6 +18,12 @@ function isReel(value: unknown): boolean {
 	return typeof reel.video === "string" && typeof reel.poster === "string";
 }
 
+function isSwipe(value: unknown): boolean {
+	if (!value || typeof value !== "object") return false;
+	const swipe = value as Record<string, unknown>;
+	return typeof swipe.reel === "string" && typeof swipe.product === "string" && typeof swipe.portrait === "string";
+}
+
 function isSettings(value: unknown): value is SiteSettings {
 	if (!value || typeof value !== "object") return false;
 	const settings = value as Record<string, unknown>;
@@ -28,6 +34,10 @@ function isSettings(value: unknown): value is SiteSettings {
 		typeof settings.location !== "string" ||
 		typeof settings.role !== "string" ||
 		typeof settings.whatsapp !== "string" ||
+		typeof settings.introHeading !== "string" ||
+		typeof settings.introSubheading !== "string" ||
+		typeof settings.introParagraph !== "string" ||
+		!isSwipe(settings.swipe) ||
 		!isReel(settings.reel)
 	) {
 		return false;

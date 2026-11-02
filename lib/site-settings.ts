@@ -1,7 +1,7 @@
 import { cacheTag } from "next/cache";
 import { defaultSiteSettings, type SiteSettings } from "./site-settings-data";
 
-export type { ReelSettings, SiteSettings, SocialLink } from "./site-settings-data";
+export type { ReelSettings, SiteSettings, SocialLink, SwipeImages } from "./site-settings-data";
 export { defaultSiteSettings } from "./site-settings-data";
 
 export async function getSiteSettings(): Promise<SiteSettings> {
@@ -15,6 +15,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 		...defaultSiteSettings,
 		...stored,
 		whatsapp: stored.whatsapp ?? defaultSiteSettings.whatsapp,
+		introHeading: stored.introHeading ?? defaultSiteSettings.introHeading,
+		introSubheading: stored.introSubheading ?? defaultSiteSettings.introSubheading,
+		introParagraph: stored.introParagraph ?? defaultSiteSettings.introParagraph,
+		swipe: { ...defaultSiteSettings.swipe, ...stored.swipe },
 		reel: { ...defaultSiteSettings.reel, ...stored.reel },
 		socials: { ...defaultSiteSettings.socials, ...stored.socials },
 	};
