@@ -120,11 +120,12 @@ export async function saveMedia(file: File): Promise<MediaItem> {
 	const uploadedAt = new Date().toISOString();
 
 	if (mode === "blob") {
+		const contentType = file.type || (kind === "video" ? "video/mp4" : undefined);
 		try {
 			await put(`${BLOB_PREFIX}${name}`, file, {
 				access: "private",
 				addRandomSuffix: false,
-				contentType: file.type || undefined,
+				contentType,
 			});
 		} catch (error) {
 			throw new Error(explainBlobError(error));

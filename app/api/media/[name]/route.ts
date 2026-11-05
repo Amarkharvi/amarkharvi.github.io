@@ -1,6 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { get } from "@vercel/blob";
+import { head, issueSignedToken, presignUrl } from "@vercel/blob";
 import { explainBlobError } from "@/lib/blob-errors";
 import { isBlobStorageEnabled } from "@/lib/storage";
 
@@ -28,65 +28,64 @@ function assertSafeName(name: string) {
 	return true;
 }
 
-function contentTypeFor(name: string, fallback?: string | null) {
+function contentTypeFor(name: string) {
 	const ext = path.extname(name).toLowerCase();
-	return TYPES[ext] ?? fallback ?? "application/octet-stream";
+	return TYPES[ext] ?? "application/octet-stream";
 }
 
 /**
- * Streams an admin upload. On Vercel the file lives in a private Blob store; locally it
- * still comes from `public/media/uploads`. Content JSON stores `/api/media/<name>` so the
- * public site never depends on a raw `*.blob.vercel-storage.com` URL.
+ * Private Blob files must not be streamed through this function for video — browsers send
+ * Range requests, and a proxied 200/partial body pair looks like a corrupted file even when
+ * the object in the store is fine. Instead we 307 to a short-lived signed Blob URL so the
+ * CDN serves bytes (and Range) directly.
+ */
+async function redirectToBlob(pathname: string) {
+	try {
+		const token = await issueSignedToken({
+			pathname,
+			operations: ["get"],
+			validUntil: Date.now() + 60 * 60 * 1000,
+		});
+		const { presignedUrl } = await presignUrl(token, {
+			operation: "get",
+			pathname,
+			access: "private",
+			validUntil: Date.now() + 30 * 60 * 1000,
+		});
+		return Response.redirect(presignedUrl, 307);
+	} catch (privateError) {
+		// Store may still be Public — fall back to the public object URL.
+		try {
+			const meta = await head(pathname);
+			return Response.redirect(meta.url, 307);
+		} catch {
+			throw privateError;
+		}
+	}
+}
+
+/**
+ * Streams an admin upload. On Vercel the file lives in Blob and this route redirects to a
+ * signed URL. Locally it still comes from `public/media/uploads`.
  */
 export async function GET(request: Request, context: RouteContext) {
 	const { name: raw } = await context.params;
 	const name = decodeURIComponent(raw);
 	if (!assertSafeName(name)) return new Response("Not found", { status: 404 });
 
-	const range = request.headers.get("range") ?? undefined;
-	const ifNoneMatch = request.headers.get("if-none-match") ?? undefined;
-
 	if (isBlobStorageEnabled()) {
 		try {
-			const result = await get(`${BLOB_PREFIX}${name}`, {
-				access: "private",
-				headers: {
-					...(range ? { Range: range } : {}),
-					...(ifNoneMatch ? { "If-None-Match": ifNoneMatch } : {}),
-				},
-			});
-
-			if (!result) return new Response("Not found", { status: 404 });
-			if (result.statusCode === 304) {
-				return new Response(null, {
-					status: 304,
-					headers: {
-						ETag: result.headers.get("etag") ?? "",
-						"Cache-Control": "public, max-age=31536000, immutable",
-					},
-				});
-			}
-
-			const headers = new Headers();
-			headers.set("Content-Type", contentTypeFor(name, result.blob.contentType));
-			headers.set("Cache-Control", "public, max-age=31536000, immutable");
-			headers.set("X-Content-Type-Options", "nosniff");
-			headers.set("Accept-Ranges", "bytes");
-			const etag = result.headers.get("etag");
-			if (etag) headers.set("ETag", etag);
-			const contentLength = result.headers.get("content-length");
-			if (contentLength) headers.set("Content-Length", contentLength);
-			else if (typeof result.blob.size === "number") headers.set("Content-Length", String(result.blob.size));
-
-			return new Response(result.stream, { status: 200, headers });
+			return await redirectToBlob(`${BLOB_PREFIX}${name}`);
 		} catch (error) {
 			console.error(`[api/media] ${explainBlobError(error)}`);
-			return new Response("Media store unavailable", { status: 503 });
+			return new Response(explainBlobError(error), { status: 503 });
 		}
 	}
 
 	const target = path.join(UPLOAD_DIR, name);
 	if (path.dirname(target) !== UPLOAD_DIR) return new Response("Not found", { status: 404 });
+
+	const range = request.headers.get("range") ?? undefined;
 
 	try {
 		const info = await stat(target);
