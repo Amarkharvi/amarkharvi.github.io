@@ -121,7 +121,16 @@ Two things degrade on purpose, since there's no server to send a form to:
 
 The LUT shop's "Order on WhatsApp" button needs no API either way, so it's unaffected. On GitHub Pages, admin saves commit `content/*.json` (and uploads) to `main`. The next Pages build reads those files, so the public site updates after the workflow finishes. Locally, `npm run dev` still signs in with `ADMIN_PASSWORD` and writes the JSON on this machine.
 
-For the full app — admin, the inquiry API, everything — deploy to a host that runs a Node server (e.g. Vercel) with `npm run build` / `npm start`, same as before.
+## Vercel (dynamic deploy)
+
+This branch is meant to run as a normal Next.js app on Vercel (`npm run build`), not as a static export. The admin, inquiry API, shop download routes, and cache revalidation all need a Node runtime.
+
+1. Create / import the project on Vercel from this `vercel` branch. Framework preset: Next.js. Build command stays `npm run build`.
+2. In the Vercel project, open **Storage → Create → Blob**, connect it to this project. That adds `BLOB_READ_WRITE_TOKEN` (and OIDC store env vars) automatically.
+3. Set the same secrets as `.env.example`: `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`, plus Razorpay / inquiry vars if you use those features.
+4. Redeploy. Admin saves write content JSON into Blob (`content/*.json`); media uploads go to public Blob URLs under `uploads/`. Local `npm run dev` without a Blob token still uses the disk under `content/` and `public/media/uploads/`.
+
+Vercel’s filesystem under `/var/task` is read-only, so skipping the Blob store makes `/api/admin/media` and content saves fail. Paid LUT files in `private/luts/` must be present in the deploy (they’re gitignored by default) — either commit them to a private fork, upload them in a build step, or store them in Blob and teach `/api/shop/download` to fetch from there.
 
 ## Implementation notes
 

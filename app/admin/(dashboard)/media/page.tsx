@@ -33,7 +33,8 @@ export default function AdminMediaPage() {
 			<div>
 				<h1 className="font-headline text-headline-sm font-semibold text-on-surface">Media Library</h1>
 				<p className="font-sans text-[13px] text-on-surface-variant">
-					Upload images and reels here, then pick them from Picture Work, the LUT Shop, or Site Basics. Files land in <code className="font-mono">public/media/uploads</code>.
+					Upload images and reels here, then pick them from Picture Work, the LUT Shop, or Site Basics. On Vercel they go to Blob storage; locally they land in{" "}
+					<code className="font-mono">public/media/uploads</code>.
 				</p>
 			</div>
 			<UploadForm onUploaded={() => setTick((value) => value + 1)} />

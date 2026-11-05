@@ -53,7 +53,7 @@ export function UploadForm({ onUploaded }: { onUploaded: () => void }) {
 			<p className="font-mono text-[11px] text-on-surface-variant">
 				{IS_STATIC_SITE
 					? "Images or short video, up to 4.5MB. The library shows it right away. Public pages pick it up after the site rebuilds."
-					: "Images (jpg, png, webp, gif, avif) or video (mp4, webm, mov), up to 80MB."}
+					: "Images (jpg, png, webp, gif, avif) or video (mp4, webm, mov). On Vercel, keep uploads under about 4.5MB."}
 			</p>
 			{error ? (
 				<p role="alert" className="font-sans text-[12px] text-red-500">

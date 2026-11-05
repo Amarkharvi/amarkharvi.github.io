@@ -1,6 +1,8 @@
 import "server-only";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { get, put } from "@vercel/blob";
+import { isBlobStorageEnabled, requireWritableStorage } from "./storage";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -9,8 +11,19 @@ function contentPath(name: string) {
 	return path.join(CONTENT_DIR, `${name}.json`);
 }
 
-/** Reads content/<name>.json. Returns `fallback` if the file doesn't exist yet or fails to parse. */
-export async function readContent<T>(name: string, fallback: T): Promise<T> {
+function blobPathname(name: string) {
+	if (!/^[a-z0-9-]+$/.test(name)) throw new Error(`Invalid content file name: ${name}`);
+	return `content/${name}.json`;
+}
+
+async function readFromBlob<T>(name: string): Promise<T | null> {
+	const result = await get(blobPathname(name), { access: "private", useCache: false });
+	if (!result || result.statusCode !== 200 || !result.stream) return null;
+	const text = await new Response(result.stream).text();
+	return JSON.parse(text) as T;
+}
+
+async function readFromFs<T>(name: string, fallback: T): Promise<T> {
 	try {
 		const raw = await readFile(contentPath(name), "utf8");
 		return JSON.parse(raw) as T;
@@ -21,11 +34,37 @@ export async function readContent<T>(name: string, fallback: T): Promise<T> {
 	}
 }
 
-/** Writes content/<name>.json atomically (write to a temp file, then rename over the target). */
+/** Reads content/<name>.json (Blob on Vercel, disk locally). Returns `fallback` when missing. */
+export async function readContent<T>(name: string, fallback: T): Promise<T> {
+	if (isBlobStorageEnabled()) {
+		try {
+			const fromBlob = await readFromBlob<T>(name);
+			if (fromBlob !== null) return fromBlob;
+		} catch (error) {
+			console.error(`[content-store] blob read failed for "${name}"`, error);
+		}
+		// First deploy / empty store: fall through to the committed defaults on disk when present.
+		return readFromFs(name, fallback);
+	}
+	return readFromFs(name, fallback);
+}
+
+/** Writes content/<name>.json to Blob on Vercel, or atomically to disk when developing locally. */
 export async function writeContent<T>(name: string, data: T): Promise<void> {
+	const mode = requireWritableStorage();
+	const body = `${JSON.stringify(data, null, "\t")}\n`;
+	if (mode === "blob") {
+		await put(blobPathname(name), body, {
+			access: "private",
+			addRandomSuffix: false,
+			allowOverwrite: true,
+			contentType: "application/json",
+		});
+		return;
+	}
 	await mkdir(CONTENT_DIR, { recursive: true });
 	const target = contentPath(name);
 	const tmp = `${target}.${process.pid}.${Date.now()}.tmp`;
-	await writeFile(tmp, JSON.stringify(data, null, "\t"), "utf8");
+	await writeFile(tmp, body, "utf8");
 	await rename(tmp, target);
 }

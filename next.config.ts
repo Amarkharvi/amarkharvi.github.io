@@ -22,6 +22,14 @@ const nextConfig: NextConfig = {
         hostname: "raw.githubusercontent.com",
         pathname: "/Amarkharvi/amarkharvi.github.io/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.blob.vercel-storage.com",
+      },
     ],
     ...(isStaticExport ? { unoptimized: true } : {}),
   },
