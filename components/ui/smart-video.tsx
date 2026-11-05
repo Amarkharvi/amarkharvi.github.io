@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 
 type SmartVideoProps = {
@@ -10,14 +10,14 @@ type SmartVideoProps = {
 	alt?: string;
 	className?: string;
 	sizes?: string;
-	/** When true, the clip starts after the poster paints (hero use). Otherwise it waits for hover. */
+	/** When true, the clip plays as soon as it can (hero use). Otherwise it waits for hover. */
 	autoPlay?: boolean;
 	preloadImage?: boolean;
 };
 
 /**
- * Poster first, video second. Heroes fade the clip in once it can play; cards keep the
- * file unloaded (`preload="none"`) until hover so the page isn't fighting several reels.
+ * Poster first for a fast first paint. Heroes keep the video visible and start it the moment
+ * data arrives; cards leave the file unloaded until hover.
  */
 export function SmartVideo({
 	src,
@@ -28,8 +28,14 @@ export function SmartVideo({
 	autoPlay = false,
 	preloadImage = false,
 }: SmartVideoProps) {
-	const [clipReady, setClipReady] = useState(false);
+	const videoRef = useRef<HTMLVideoElement>(null);
 	const [mountClip, setMountClip] = useState(autoPlay);
+
+	function startPlayback(clip: HTMLVideoElement) {
+		clip.muted = true;
+		const attempt = clip.play();
+		if (attempt) attempt.catch(() => {});
+	}
 
 	return (
 		<div
@@ -49,6 +55,7 @@ export function SmartVideo({
 			/>
 			{mountClip ? (
 				<video
+					ref={videoRef}
 					src={src}
 					poster={poster}
 					muted
@@ -56,20 +63,17 @@ export function SmartVideo({
 					playsInline
 					autoPlay={autoPlay}
 					preload={autoPlay ? "auto" : "none"}
-					onPlaying={() => setClipReady(true)}
-					onLoadedData={(event) => {
-						if (!autoPlay) event.currentTarget.play().catch(() => {});
-					}}
+					onLoadedData={(event) => startPlayback(event.currentTarget)}
+					onCanPlay={(event) => startPlayback(event.currentTarget)}
 					onPointerLeave={(event) => {
 						if (autoPlay) return;
 						event.currentTarget.pause();
 						event.currentTarget.currentTime = 0;
-						setClipReady(false);
 					}}
 					className={cn(
 						className,
-						"object-cover transition-opacity duration-500",
-						autoPlay ? (clipReady ? "opacity-100" : "opacity-0") : "opacity-0 group-hover:opacity-100",
+						"object-cover",
+						autoPlay ? "opacity-100" : "opacity-0 transition-opacity duration-300 group-hover:opacity-100",
 					)}
 				/>
 			) : null}
