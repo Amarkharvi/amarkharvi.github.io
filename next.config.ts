@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
   cacheComponents: !isStaticExport,
   images: {
     qualities: [75, 90],
+    // Upload filenames are unique (random suffix), so optimized derivatives can live a long time.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     // Admin thumbnails on the static site load from the commit directly. The public pages keep
     // using `/media/uploads/...`, which exists only after GitHub Pages rebuilds.
     remotePatterns: [
@@ -25,6 +27,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.private.blob.vercel-storage.com",
       },
       {
         protocol: "https",

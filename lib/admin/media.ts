@@ -126,6 +126,8 @@ export async function saveMedia(file: File): Promise<MediaItem> {
 				access: "private",
 				addRandomSuffix: false,
 				contentType,
+				// Long CDN TTL — names are unique, so overwrites are not a concern.
+				cacheControlMaxAge: 60 * 60 * 24 * 30,
 			});
 		} catch (error) {
 			throw new Error(explainBlobError(error));

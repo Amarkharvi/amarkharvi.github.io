@@ -1,11 +1,14 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { head, issueSignedToken, presignUrl } from "@vercel/blob";
+import { get, head, presignUrl } from "@vercel/blob";
 import { explainBlobError } from "@/lib/blob-errors";
+import { getBlobReadToken } from "@/lib/blob-sign";
 import { isBlobStorageEnabled } from "@/lib/storage";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "media", "uploads");
 const BLOB_PREFIX = "uploads/";
+const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"]);
+const VIDEO_EXT = new Set([".mp4", ".webm", ".mov"]);
 
 const TYPES: Record<string, string> = {
 	".jpg": "image/jpeg",
@@ -28,36 +31,47 @@ function assertSafeName(name: string) {
 	return true;
 }
 
-function contentTypeFor(name: string) {
+function contentTypeFor(name: string, fallback?: string | null) {
 	const ext = path.extname(name).toLowerCase();
-	return TYPES[ext] ?? "application/octet-stream";
+	return TYPES[ext] ?? fallback ?? "application/octet-stream";
 }
 
-/**
- * Private Blob files must not be streamed through this function for video — browsers send
- * Range requests, and a proxied 200/partial body pair looks like a corrupted file even when
- * the object in the store is fine. Instead we 307 to a short-lived signed Blob URL so the
- * CDN serves bytes (and Range) directly.
- */
-async function redirectToBlob(pathname: string) {
+function kindOf(name: string): "image" | "video" | "other" {
+	const ext = path.extname(name).toLowerCase();
+	if (IMAGE_EXT.has(ext)) return "image";
+	if (VIDEO_EXT.has(ext)) return "video";
+	return "other";
+}
+
+/** Signed CDN URL for video (Range-friendly). Token is cached; only the HMAC is per pathname. */
+async function redirectToSignedBlob(pathname: string) {
 	try {
-		const token = await issueSignedToken({
-			pathname,
-			operations: ["get"],
-			validUntil: Date.now() + 60 * 60 * 1000,
-		});
+		const token = await getBlobReadToken();
 		const { presignedUrl } = await presignUrl(token, {
 			operation: "get",
 			pathname,
 			access: "private",
-			validUntil: Date.now() + 30 * 60 * 1000,
+			// Long enough for a reel to play; short enough that a leaked URL expires.
+			validUntil: Date.now() + 60 * 60 * 1000,
 		});
-		return Response.redirect(presignedUrl, 307);
+		return new Response(null, {
+			status: 307,
+			headers: {
+				Location: presignedUrl,
+				// Browsers may reuse this redirect briefly so repeat views skip re-signing.
+				"Cache-Control": "public, max-age=120, stale-while-revalidate=600",
+			},
+		});
 	} catch (privateError) {
-		// Store may still be Public — fall back to the public object URL.
 		try {
 			const meta = await head(pathname);
-			return Response.redirect(meta.url, 307);
+			return new Response(null, {
+				status: 307,
+				headers: {
+					Location: meta.url,
+					"Cache-Control": "public, max-age=300, stale-while-revalidate=3600",
+				},
+			});
 		} catch {
 			throw privateError;
 		}
@@ -65,17 +79,49 @@ async function redirectToBlob(pathname: string) {
 }
 
 /**
- * Streams an admin upload. On Vercel the file lives in Blob and this route redirects to a
- * signed URL. Locally it still comes from `public/media/uploads`.
+ * Images stream through this stable `/api/media/<name>` URL so `next/image` can cache
+ * optimizations. Videos redirect to a signed Blob URL so Range requests hit the CDN.
  */
 export async function GET(request: Request, context: RouteContext) {
 	const { name: raw } = await context.params;
 	const name = decodeURIComponent(raw);
 	if (!assertSafeName(name)) return new Response("Not found", { status: 404 });
 
+	const pathname = `${BLOB_PREFIX}${name}`;
+	const kind = kindOf(name);
+
 	if (isBlobStorageEnabled()) {
 		try {
-			return await redirectToBlob(`${BLOB_PREFIX}${name}`);
+			if (kind === "video") return await redirectToSignedBlob(pathname);
+
+			const ifNoneMatch = request.headers.get("if-none-match") ?? undefined;
+			const result = await get(pathname, {
+				access: "private",
+				headers: ifNoneMatch ? { "If-None-Match": ifNoneMatch } : undefined,
+			});
+			if (!result) return new Response("Not found", { status: 404 });
+			if (result.statusCode === 304) {
+				return new Response(null, {
+					status: 304,
+					headers: {
+						ETag: result.headers.get("etag") ?? "",
+						"Cache-Control": "public, max-age=31536000, immutable",
+					},
+				});
+			}
+
+			const headers = new Headers();
+			headers.set("Content-Type", contentTypeFor(name, result.blob.contentType));
+			// Upload names include a random suffix — safe to cache forever at the edge + browser.
+			headers.set("Cache-Control", "public, max-age=31536000, immutable");
+			headers.set("X-Content-Type-Options", "nosniff");
+			const etag = result.headers.get("etag");
+			if (etag) headers.set("ETag", etag);
+			const contentLength = result.headers.get("content-length");
+			if (contentLength) headers.set("Content-Length", contentLength);
+			else if (typeof result.blob.size === "number") headers.set("Content-Length", String(result.blob.size));
+
+			return new Response(result.stream, { status: 200, headers });
 		} catch (error) {
 			console.error(`[api/media] ${explainBlobError(error)}`);
 			return new Response(explainBlobError(error), { status: 503 });

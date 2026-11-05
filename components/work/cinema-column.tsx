@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
+import { SmartVideo } from "@/components/ui/smart-video";
 import { mediaKindOf } from "@/lib/content-data";
 import { getFilms } from "@/lib/content";
 import { getSiteSettings, parseToolChips } from "@/lib/site-settings";
@@ -68,13 +69,11 @@ export async function CinemaColumn() {
 				<Link href={featureHref} className="flex flex-1 flex-col">
 					<div className="relative aspect-video overflow-hidden bg-inverse-surface">
 						{featureVideo ? (
-							<video
+							<SmartVideo
 								src={featureSrc}
 								poster={featurePoster}
-								muted
-								loop
-								playsInline
-								autoPlay
+								alt={persona.featureTitle || "Persona 01 card"}
+								sizes="(min-width: 1024px) 640px, 100vw"
 								className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
 							/>
 						) : (

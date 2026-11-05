@@ -73,6 +73,7 @@ export function ReelPlayer({ video, poster }: { video?: string; poster?: string 
 					poster={posterSrc}
 					loop
 					playsInline
+					preload="metadata"
 					onTimeUpdate={(event) => setFrame(START_FRAME + Math.floor(event.currentTarget.currentTime * FPS))}
 					className={cn(
 						"absolute inset-0 h-full w-full object-cover opacity-90 transition-transform ease-linear",

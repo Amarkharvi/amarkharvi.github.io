@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
+import { SmartVideo } from "@/components/ui/smart-video";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { getSiteSettings, parseToolChips } from "@/lib/site-settings";
 
@@ -13,13 +14,13 @@ export async function CinemaHero() {
 	return (
 		<TiltCard strength={5} className="relative flex h-full min-h-[400px] flex-col justify-between overflow-hidden bg-inverse-surface p-5 text-white md:p-7">
 			{settings.reel.video ? (
-				<video
+				<SmartVideo
 					src={settings.reel.video}
 					poster={poster}
+					alt="Window light on a seated figure, the cover frame for the cinematography side"
 					autoPlay
-					muted
-					loop
-					playsInline
+					preloadImage
+					sizes="(min-width: 768px) 60vw, 100vw"
 					className="absolute inset-0 h-full w-full object-cover"
 				/>
 			) : (

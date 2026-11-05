@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
+import { SmartVideo } from "@/components/ui/smart-video";
 import { mediaKindOf } from "@/lib/content-data";
 import { repos } from "@/lib/content";
 import { getSiteSettings, parseToolChips } from "@/lib/site-settings";
@@ -35,15 +36,22 @@ export async function DevColumn() {
 
 			<article className={`group ${personaCard}`}>
 				{featureSrc || featurePoster ? (
-					<Link href={featureHref} className="relative block aspect-video overflow-hidden bg-inverse-surface">
-						{featureVideo ? (
+					<Link href={featureHref} className="group relative block aspect-video overflow-hidden bg-inverse-surface">
+						{featureVideo && featurePoster ? (
+							<SmartVideo
+								src={featureSrc}
+								poster={featurePoster}
+								alt={persona.featureTitle || "Persona 02 card"}
+								sizes="(min-width: 1024px) 640px, 100vw"
+								className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+							/>
+						) : featureVideo ? (
 							<video
 								src={featureSrc}
-								poster={featurePoster || undefined}
 								muted
 								loop
 								playsInline
-								autoPlay
+								preload="metadata"
 								className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
 							/>
 						) : (

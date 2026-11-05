@@ -27,7 +27,7 @@ export function MediaGrid({ items, onDeleted }: { items: UploadItem[]; onDeleted
 						{item.kind === "image" ? (
 							<Image src={item.previewUrl ?? item.url} alt={item.name} fill sizes="160px" className="object-cover" unoptimized />
 						) : (
-							<video src={item.previewUrl ?? item.url} muted className="h-full w-full object-cover" />
+							<video src={item.previewUrl ?? item.url} muted preload="metadata" className="h-full w-full object-cover" />
 						)}
 						{item.kind === "video" ? (
 							<span className="absolute left-1.5 top-1.5 rounded bg-black/60 px-1.5 py-0.5 font-mono text-[9px] text-white">REEL</span>
