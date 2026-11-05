@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ShaderSandbox } from "@/components/spectra/shader-sandbox";
 import { WgslCode } from "@/components/spectra/wgsl-code";
 import { CopyButton } from "@/components/ui/copy-button";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
+import { getFacts } from "@/lib/facts";
 import { cn } from "@/lib/cn";
 import { docs, site } from "@/lib/site";
 
@@ -27,7 +29,8 @@ const targets = [
 	{ icon: "devices", title: "React", sub: "Next.js" },
 ];
 
-export default function SpectraPage() {
+export default async function SpectraPage() {
+	const facts = await getFacts();
 	return (
 		<div className="flex flex-col pb-8">
 			<div className="flex items-center justify-between bg-surface-container-low px-6 py-2.5 font-mono text-label-mono md:px-8 dark:border-b dark:border-primary/10">
@@ -50,9 +53,13 @@ export default function SpectraPage() {
 				</p>
 			</section>
 
+			<div className="px-6 pb-2 md:px-8">
+				<FactDeck label="Under the sketch" facts={facts.spectra} />
+			</div>
+
 			<ShaderSandbox />
 
-			<section className="grid gap-6 px-6 py-4 md:px-8 lg:grid-cols-[1.4fr_1fr]">
+			<section className="grid grid-cols-1 gap-6 px-6 py-4 md:px-8 lg:grid-cols-[1.4fr_1fr]">
 				<WgslCode />
 
 				<div className="flex flex-col gap-3">
@@ -113,7 +120,7 @@ export default function SpectraPage() {
 				</div>
 			</section>
 
-			<section className="grid gap-6 px-6 py-4 md:px-8 lg:grid-cols-2">
+			<section className="grid grid-cols-1 gap-6 px-6 py-4 md:px-8 lg:grid-cols-2">
 				<div className="flex flex-col gap-3">
 					<div>
 						<span className="font-mono text-label-mono uppercase tracking-widest text-tertiary">Public code</span>
@@ -128,7 +135,7 @@ export default function SpectraPage() {
 								iconClassName="text-[13px]"
 							/>
 						</div>
-						<div className="flex flex-col gap-1 p-4 font-mono text-[13px]">
+						<div className="flex flex-col gap-1 overflow-x-auto p-4 font-mono text-[13px] whitespace-nowrap">
 							{installCommands.map((command) => (
 								<p key={command}>
 									<span className="select-none text-cyan-300">$ </span>
@@ -139,7 +146,7 @@ export default function SpectraPage() {
 					</div>
 					<div className="grid grid-cols-3 gap-2">
 						{targets.map((target) => (
-							<div key={target.title} className="flex flex-col items-center gap-1 rounded-xl bg-surface-container p-3 text-center dark:border dark:border-primary/10">
+							<div key={target.title} className="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-surface-container p-2 text-center wrap-anywhere sm:p-3 dark:border dark:border-primary/10">
 								<Icon name={target.icon} className="text-[20px] text-primary" />
 								<span className="font-sans text-[12px] font-bold text-on-surface">{target.title}</span>
 								<span className="font-mono text-[10px] text-on-surface-variant">{target.sub}</span>

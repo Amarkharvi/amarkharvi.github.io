@@ -24,6 +24,8 @@ export default function AdminSitePage() {
 					introParagraph: stored.introParagraph ?? defaultSiteSettings.introParagraph,
 					swipe: { ...defaultSiteSettings.swipe, ...stored.swipe },
 					reel: { ...defaultSiteSettings.reel, ...stored.reel },
+					persona1: { ...defaultSiteSettings.persona1, ...stored.persona1 },
+					persona2: { ...defaultSiteSettings.persona2, ...stored.persona2 },
 					socials: { ...defaultSiteSettings.socials, ...stored.socials },
 				});
 				setMedia(uploads);
@@ -43,7 +45,9 @@ export default function AdminSitePage() {
 		<div className="flex flex-col gap-4">
 			<div>
 				<h1 className="font-headline text-headline-sm font-semibold text-on-surface">Site Basics</h1>
-				<p className="font-sans text-[13px] text-on-surface-variant">The tagline in the header, the availability pill, location, and your social links.</p>
+				<p className="font-sans text-[13px] text-on-surface-variant">
+					Header basics, Dual Persona intro, Persona 01 / 02 heroes, showreel, swipe thumbs, and social links.
+				</p>
 			</div>
 			<SiteSettingsEditor initialSettings={settings} media={media} />
 		</div>

@@ -38,7 +38,8 @@ export default function AdminDashboardPage() {
 		{ href: "/admin/about", icon: "portrait", label: "About Page", stat: "Profile photo, headline, bio" },
 		{ href: "/admin/products", icon: "storefront", label: "LUT Shop", stat: `${stats.products} products` },
 		{ href: "/admin/stack", icon: "terminal", label: "Stack & Credentials", stat: `${stats.skills} skill chips` },
-		{ href: "/admin/site", icon: "tune", label: "Site Basics", stat: "Tagline, availability, socials" },
+		{ href: "/admin/site", icon: "tune", label: "Site Basics", stat: "Personas, showreel, socials" },
+		{ href: "/admin/facts", icon: "psychology", label: "Facts", stat: "The short cards on every page" },
 	];
 
 	return (
@@ -51,7 +52,7 @@ export default function AdminDashboardPage() {
 						: "Edits here write to JSON files on this server and go live immediately — no redeploy needed."}
 				</p>
 			</div>
-			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 				{cards.map((card) => (
 					<Link
 						key={card.href}

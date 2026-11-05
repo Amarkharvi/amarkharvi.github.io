@@ -32,7 +32,7 @@ export function SiteHeaderView({ pathname, tagline = site.tagline, availability 
 	if (pathname?.startsWith("/admin")) return null;
 
 	return (
-		<header className="pt-safe fixed inset-x-0 top-0 z-50 bg-surface/85 shadow-[0_1px_8px_rgba(40,30,160,0.06)] backdrop-blur-xl dark:border-b dark:border-primary/10 dark:shadow-[0_4px_20px_rgba(3,7,18,0.6)]">
+		<header className="pt-safe fixed inset-x-0 top-0 z-50 bg-surface/92 shadow-[0_1px_8px_rgba(40,30,160,0.06)] backdrop-blur-md dark:border-b dark:border-primary/10 dark:bg-surface/88 dark:shadow-[0_4px_20px_rgba(3,7,18,0.6)]">
 			<div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
 				<div className="flex min-w-0 items-center gap-2">
 					{parent ? (
@@ -73,7 +73,7 @@ export function SiteHeaderView({ pathname, tagline = site.tagline, availability 
 				</nav>
 
 				<div className="flex shrink-0 items-center gap-2">
-					<div className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-high px-2.5 py-1 dark:border dark:border-primary/20 dark:bg-surface-container">
+					<div className="hidden items-center gap-1.5 rounded-full sm:inline-flex md:hidden lg:inline-flex bg-surface-container-high px-2.5 py-1 dark:border dark:border-primary/20 dark:bg-surface-container">
 						<span className="h-2 w-2 animate-pulse rounded-full bg-tertiary-fixed-dim dark:shadow-[0_0_8px_#38bdf8]" />
 						<span className="font-mono text-[11px] text-on-surface-variant dark:text-tertiary-fixed">{availability}</span>
 					</div>

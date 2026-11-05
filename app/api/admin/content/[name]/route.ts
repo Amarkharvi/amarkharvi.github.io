@@ -1,10 +1,12 @@
 import { saveAboutContentAction } from "@/app/admin/(dashboard)/about/actions";
+import { saveFactsAction } from "@/app/admin/(dashboard)/facts/actions";
 import { saveFilmsAction } from "@/app/admin/(dashboard)/films/actions";
 import { saveProductsAction } from "@/app/admin/(dashboard)/products/actions";
 import { saveSiteSettingsAction } from "@/app/admin/(dashboard)/site/actions";
 import { saveCredentialsAction, saveTechStackAction } from "@/app/admin/(dashboard)/stack/actions";
 import { isAdminAuthenticated } from "@/lib/admin/guard";
 import { getAboutContent } from "@/lib/about";
+import { getFacts } from "@/lib/facts";
 import { getCredentials, getFilms, getTechStack } from "@/lib/content";
 import { getProducts } from "@/lib/products";
 import { getSiteSettings } from "@/lib/site-settings";
@@ -19,6 +21,7 @@ const documents: Record<string, { field: string; load: () => Promise<unknown>; s
 	"site-settings": { field: "settings", load: getSiteSettings, save: saveSiteSettingsAction },
 	"tech-stack": { field: "techStack", load: getTechStack, save: saveTechStackAction },
 	credentials: { field: "credentials", load: getCredentials, save: saveCredentialsAction },
+	facts: { field: "facts", load: getFacts, save: saveFactsAction },
 };
 
 export async function GET(_request: Request, context: { params: Promise<{ name: string }> }) {

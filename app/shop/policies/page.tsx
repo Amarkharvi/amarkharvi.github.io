@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getSiteSettings } from "@/lib/site-settings";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -7,43 +8,55 @@ export const metadata: Metadata = {
 	description: "Terms of sale, refund policy, privacy and contact details for Amar Kharvi's LUT shop.",
 };
 
-const sections = [
-	{
-		id: "terms",
-		title: "Terms of sale",
-		body: [
-			"Each purchase gives you a personal, non-transferable licence to use the LUT in your own and your clients' projects, including commercial work.",
-			"You may not resell, share, upload or redistribute the LUT files, alone or as part of another pack.",
-			"Prices are in Indian Rupees (INR) and include applicable taxes unless stated otherwise.",
-		],
-	},
-	{
-		id: "delivery",
-		title: "Delivery",
-		body: [
-			"LUTs are digital products. Order from the shop page and WhatsApp opens with the look, price, and your details filled in.",
-			"Amar replies on that chat with payment details and the .cube files. Keep the chat if you need the files sent again.",
-		],
-	},
-	{
-		id: "refunds",
-		title: "Cancellation & refunds",
-		body: [
-			"Payment is arranged directly with Amar on WhatsApp. This site does not take card or UPI payments.",
-			"If a file is corrupt or never arrives after you've paid, message the same WhatsApp chat and Amar will send it again or refund you.",
-		],
-	},
-	{
-		id: "privacy",
-		title: "Privacy",
-		body: [
-			"The shop does not store your card or UPI details. Your name, email, and order note are only placed in the WhatsApp message you choose to send.",
-			"Amar keeps that chat so he can deliver the files and answer follow-ups.",
-		],
-	},
-];
+function buildSections(chat: string, opens: string) {
+	return [
+		{
+			id: "terms",
+			title: "Terms of sale",
+			body: [
+				"Each purchase gives you a personal, non-transferable licence to use the LUT in your own and your clients' projects, including commercial work.",
+				"You may not resell, share, upload or redistribute the LUT files, alone or as part of another pack.",
+				"Prices are in Indian Rupees (INR) and include applicable taxes unless stated otherwise.",
+			],
+		},
+		{
+			id: "delivery",
+			title: "Delivery",
+			body: [
+				`LUTs are digital products. Order from the shop page and ${opens}`,
+				"Amar replies on that chat with payment details and the .cube files. Keep the chat if you need the files sent again.",
+			],
+		},
+		{
+			id: "refunds",
+			title: "Cancellation & refunds",
+			body: [
+				`Payment is arranged directly with Amar on ${chat}. This site does not take card or UPI payments.`,
+				`If a file is corrupt or never arrives after you've paid, message the same ${chat} chat and Amar will send it again or refund you.`,
+			],
+		},
+		{
+			id: "privacy",
+			title: "Privacy",
+			body: [
+				`The shop does not store your card or UPI details. Your name, email, and order note are only placed in the ${chat} message you choose to send.`,
+				"Amar keeps that chat so he can deliver the files and answer follow-ups.",
+			],
+		},
+	];
+}
 
-export default function PoliciesPage() {
+export default async function PoliciesPage() {
+	const settings = await getSiteSettings();
+	const instagram = settings.orderChannel === "instagram";
+	const chat = instagram ? "Instagram" : "WhatsApp";
+	const sections = buildSections(
+		chat,
+		instagram
+			? "an Instagram chat opens with Amar, and your order details are copied for you to paste and send."
+			: "WhatsApp opens with the look, price, and your details filled in.",
+	);
+
 	return (
 		<div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 md:px-8">
 			<div>
@@ -68,7 +81,7 @@ export default function PoliciesPage() {
 					<Link href="/shop" className="font-bold underline">
 						LUT shop
 					</Link>
-					. It opens WhatsApp with the details already filled in.
+					. {instagram ? "It opens an Instagram chat with Amar." : "It opens WhatsApp with the details already filled in."}
 				</p>
 			</section>
 		</div>

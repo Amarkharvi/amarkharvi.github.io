@@ -233,9 +233,33 @@
 	}
 }
 
+/* Lenis recommended base (kept here because the package sets sideEffects:false and CSS imports can be dropped). */
+html.lenis,
+html.lenis body {
+	height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+	overflow: clip;
+}
+
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+	overscroll-behavior: contain;
+}
+
+.lenis.lenis-smooth iframe {
+	pointer-events: none;
+}
+
 @layer base {
 	html {
 		-webkit-tap-highlight-color: transparent;
+		/* Lenis owns smooth scrolling; leave the browser's CSS smooth off so the two don't fight. */
+		scroll-behavior: auto;
 	}
 
 	body {
@@ -248,9 +272,14 @@
 			color 0.35s ease;
 	}
 
-	[data-theme="dark"] body {
+	/* Fixed layer, not background-attachment:fixed — that forces a full-viewport repaint on every scroll. */
+	[data-theme="dark"] body::before {
+		content: "";
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
 		background-image: radial-gradient(ellipse at top, rgb(78 53 222 / 0.28) 0%, transparent 60%);
-		background-attachment: fixed;
 	}
 
 	::selection {

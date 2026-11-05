@@ -36,7 +36,7 @@ export function ProductsEditor({ initialProducts, media }: { initialProducts: Pr
 						<span className="font-mono text-[10px] text-on-surface-variant">{product.files.map((file) => file.label).join(", ")}</span>
 					</div>
 
-					<div className="grid gap-3 md:grid-cols-2">
+					<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 						<Field label="Name" value={product.name} onChange={(value) => update(index, { name: value })} />
 						<Field label="Tagline" value={product.tagline} onChange={(value) => update(index, { tagline: value })} />
 						<Field label="Price (INR)" value={toRupees(product.price)} onChange={(value) => update(index, { price: toPaise(value) })} />
@@ -57,9 +57,25 @@ export function ProductsEditor({ initialProducts, media }: { initialProducts: Pr
 					</div>
 
 					<Field label="Description" value={product.description} onChange={(value) => update(index, { description: value })} as="textarea" />
-					<MediaPicker label="Preview image" value={product.image} onChange={(value) => update(index, { image: value })} media={media} />
+					<div className="flex flex-col gap-3 rounded-xl bg-surface-container p-3">
+						<div>
+							<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Before / after slider</span>
+							<p className="font-sans text-[12px] text-on-surface-variant">
+								Upload the same shot twice: one without the LUT, one with it. Visitors drag the slider to compare. Set both to use real photos; leave either
+								empty to fall back to the preview image and CSS filter below.
+							</p>
+						</div>
+						<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+							<MediaPicker label="Before photo (no LUT)" value={product.before ?? ""} onChange={(value) => update(index, { before: value || undefined })} media={media} />
+							<MediaPicker label="After photo (LUT applied)" value={product.after ?? ""} onChange={(value) => update(index, { after: value || undefined })} media={media} />
+						</div>
+						{product.before && product.after ? null : product.before || product.after ? (
+							<p className="font-sans text-[12px] text-red-500">Add both photos for the slider to use them.</p>
+						) : null}
+					</div>
+					<MediaPicker label="Preview image (fallback and card thumbnail)" value={product.image} onChange={(value) => update(index, { image: value })} media={media} />
 					<Field label="Image alt text" value={product.imageAlt} onChange={(value) => update(index, { imageAlt: value })} />
-					<Field label="Preview CSS filter (advanced)" value={product.preview} onChange={(value) => update(index, { preview: value })} />
+					<Field label="Preview CSS filter (advanced, fallback only)" value={product.preview} onChange={(value) => update(index, { preview: value })} />
 				</Card>
 			))}
 

@@ -4,7 +4,7 @@ import { motion, useReducedMotion, useSpring } from "motion/react";
 import type { ComponentPropsWithoutRef, PointerEvent as ReactPointerEvent } from "react";
 import { cn } from "@/lib/cn";
 
-const spring = { stiffness: 220, damping: 22, mass: 0.6 };
+const spring = { stiffness: 280, damping: 28, mass: 0.45 };
 
 // Motion redefines onDrag*/onAnimationStart with its own gesture signatures, which conflicts with
 // React's native DOM event types for the same prop names — omit them since this wrapper doesn't

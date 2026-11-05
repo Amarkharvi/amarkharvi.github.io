@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { isAdminAuthenticated } from "@/lib/admin/guard";
 import { deleteMedia, listMedia, saveMedia } from "@/lib/admin/media";
 
@@ -14,7 +15,10 @@ export async function POST(request: Request) {
 		return Response.json({ error: "Choose an image or video first." }, { status: 400 });
 	}
 	try {
-		return Response.json(await saveMedia(file));
+		const item = await saveMedia(file);
+		// Refresh every admin editor so the new file appears in MediaPicker without a hard reload.
+		revalidatePath("/admin", "layout");
+		return Response.json(item);
 	} catch (error) {
 		return Response.json({ error: error instanceof Error ? error.message : "Upload failed." }, { status: 400 });
 	}
@@ -25,6 +29,7 @@ export async function DELETE(request: Request) {
 	const name = new URL(request.url).searchParams.get("name") ?? "";
 	try {
 		await deleteMedia(name);
+		revalidatePath("/admin", "layout");
 		return Response.json({ ok: true });
 	} catch (error) {
 		return Response.json({ error: error instanceof Error ? error.message : "Delete failed." }, { status: 400 });

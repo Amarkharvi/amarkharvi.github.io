@@ -5,7 +5,9 @@ import { FrameArchive } from "@/components/study/frame-archive";
 import { GradeComparison } from "@/components/study/grade-comparison";
 import { LightingDiagram } from "@/components/study/lighting-diagram";
 import { StudyActions } from "@/components/study/study-actions";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
+import { getFacts } from "@/lib/facts";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 export const metadata: Metadata = {
@@ -26,7 +28,8 @@ const kit = [
 	{ label: "Edit bay", icon: "palette", iconClass: "text-primary", name: "Resolve & Premiere", spec: "Lightroom for stills", note: "Cuts and grade in DaVinci Resolve or Premiere Pro. Stills finished in Lightroom." },
 ];
 
-export default function QuietMomentsStudyPage() {
+export default async function QuietMomentsStudyPage() {
+	const facts = await getFacts();
 	return (
 		<div className="flex flex-col">
 			<div className="flex items-center justify-between bg-surface-container-lowest px-5 py-3 md:mt-4 md:rounded-full md:px-6">
@@ -95,7 +98,7 @@ export default function QuietMomentsStudyPage() {
 							</span>
 						</div>
 					</div>
-					<div className="no-scrollbar mt-1 flex w-full items-center justify-between gap-2 overflow-x-auto rounded-lg bg-surface-container-low p-2.5 shadow-inner">
+					<div data-lenis-prevent className="no-scrollbar mt-1 flex w-full items-center justify-between gap-2 overflow-x-auto rounded-lg bg-surface-container-low p-2.5 shadow-inner">
 						{laurels.map((laurel, i) => (
 							<div key={laurel.title} className="flex shrink-0 items-center gap-2">
 								{i > 0 ? <span className="mr-2 h-6 w-px shrink-0 bg-outline-variant" /> : null}
@@ -110,7 +113,11 @@ export default function QuietMomentsStudyPage() {
 				</div>
 			</section>
 
-			<div className="grid gap-x-8 lg:grid-cols-2">
+			<div className="px-5 py-3 md:px-8">
+				<FactDeck label="While you watch" facts={facts.study} />
+			</div>
+
+			<div className="grid grid-cols-1 gap-x-8 lg:grid-cols-2">
 				<section className="flex flex-col gap-3 px-5 py-3 md:px-8 lg:pr-0">
 					<SectionHeading title="What the work covers" icon="memory" aside={<span className="text-tertiary">{"REEL // PRODUCT // FACE"}</span>} />
 					<div className="grid grid-cols-2 gap-2.5">

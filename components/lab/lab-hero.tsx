@@ -1,18 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { useLenis } from "lenis/react";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Icon } from "@/components/ui/icon";
+import { scrollToTarget } from "@/lib/scroll-to";
 import { site } from "@/lib/site";
 
 export function LabHero({ canvasId }: { canvasId: string }) {
+	const lenis = useLenis();
 	return (
 		<div className="relative w-full overflow-hidden rounded-2xl bg-primary-container p-6 text-on-primary-container shadow-xl dark:border dark:border-primary/30 dark:bg-[linear-gradient(135deg,#2a1f8f,#4e35de_120%)]">
-			<div className="absolute -right-4 -top-3 z-20 flex rotate-6 items-center gap-1.5 rounded-full bg-tertiary-fixed px-3 py-1.5 text-on-tertiary-fixed shadow-lg">
+			<div className="absolute -right-4 -top-3 z-20 hidden rotate-6 sm:flex items-center gap-1.5 rounded-full bg-tertiary-fixed px-3 py-1.5 text-on-tertiary-fixed shadow-lg">
 				<Icon name="bolt" className="text-[16px]" />
 				<span className="font-sans text-label-pill font-bold uppercase tracking-wider">Django • React</span>
 			</div>
-			<div className="absolute -left-3 bottom-14 z-20 -rotate-12 rounded-lg bg-secondary-fixed px-2.5 py-1 font-mono text-[11px] text-on-secondary-fixed shadow-md">
+			<div className="absolute -left-3 bottom-14 z-20 hidden -rotate-12 rounded-lg sm:block bg-secondary-fixed px-2.5 py-1 font-mono text-[11px] text-on-secondary-fixed shadow-md">
 				ColdFusion
 			</div>
 			<div className="pointer-events-none absolute -bottom-16 -right-16 h-52 w-52 rounded-full border-[10px] border-primary/40 opacity-40" />
@@ -48,7 +51,10 @@ export function LabHero({ canvasId }: { canvasId: string }) {
 				<div className="flex flex-wrap items-center gap-2 pt-2">
 					<button
 						type="button"
-						onClick={() => document.getElementById(canvasId)?.scrollIntoView({ behavior: "smooth", block: "center" })}
+						onClick={() => {
+							const target = document.getElementById(canvasId);
+							if (target) scrollToTarget(lenis, target, { offset: -96 });
+						}}
 						className="flex items-center gap-1.5 rounded-full bg-tertiary-fixed px-3.5 py-2 font-sans text-label-pill font-bold text-on-tertiary-fixed shadow-md transition-all active:translate-y-0.5"
 					>
 						<Icon name="play_arrow" className="text-[16px]" />

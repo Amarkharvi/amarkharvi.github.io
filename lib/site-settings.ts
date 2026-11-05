@@ -1,8 +1,8 @@
 import { cacheTag } from "next/cache";
-import { defaultSiteSettings, type SiteSettings } from "./site-settings-data";
+import { defaultSiteSettings, isOrderChannel, type SiteSettings } from "./site-settings-data";
 
-export type { ReelSettings, SiteSettings, SocialLink, SwipeImages } from "./site-settings-data";
-export { defaultSiteSettings } from "./site-settings-data";
+export type { OrderChannel, PersonaSide, ReelSettings, SiteSettings, SocialLink, SwipeImages } from "./site-settings-data";
+export { defaultSiteSettings, instagramUsername, isOrderChannel, parseToolChips } from "./site-settings-data";
 
 export async function getSiteSettings(): Promise<SiteSettings> {
 	"use cache";
@@ -15,11 +15,14 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 		...defaultSiteSettings,
 		...stored,
 		whatsapp: stored.whatsapp ?? defaultSiteSettings.whatsapp,
+		orderChannel: isOrderChannel(stored.orderChannel) ? stored.orderChannel : defaultSiteSettings.orderChannel,
 		introHeading: stored.introHeading ?? defaultSiteSettings.introHeading,
 		introSubheading: stored.introSubheading ?? defaultSiteSettings.introSubheading,
 		introParagraph: stored.introParagraph ?? defaultSiteSettings.introParagraph,
 		swipe: { ...defaultSiteSettings.swipe, ...stored.swipe },
 		reel: { ...defaultSiteSettings.reel, ...stored.reel },
+		persona1: { ...defaultSiteSettings.persona1, ...stored.persona1 },
+		persona2: { ...defaultSiteSettings.persona2, ...stored.persona2 },
 		socials: { ...defaultSiteSettings.socials, ...stored.socials },
 	};
 }

@@ -26,7 +26,7 @@ export function FrameArchive() {
 
 	return (
 		<>
-			<div className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-3 md:px-0">
+			<div data-lenis-prevent className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-3 md:px-0">
 				{stills.map((still, i) => (
 					<button
 						key={still.src}

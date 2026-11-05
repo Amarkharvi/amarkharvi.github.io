@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { Field, SaveBar, SelectField } from "@/components/admin/fields";
 import { Icon } from "@/components/ui/icon";
-import type { TechStackItem } from "@/lib/content";
+import type { TechStackItem } from "@/lib/content-data";
 import { saveTechStackForm, type SaveState } from "@/lib/admin/browser-store";
 
 const dotOptions = [

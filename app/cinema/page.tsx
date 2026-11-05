@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FilmCard } from "@/components/cinema/film-card";
+import { CinemaBrowser } from "@/components/cinema/cinema-browser";
 import { ReelPlayer } from "@/components/cinema/reel-player";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
+import { getFacts } from "@/lib/facts";
 import { getFilms } from "@/lib/content";
 import { getSiteSettings } from "@/lib/site-settings";
 import { docs } from "@/lib/site";
@@ -13,83 +15,88 @@ export const metadata: Metadata = {
 };
 
 export default async function CinemaPage() {
-	const [films, settings] = await Promise.all([getFilms(), getSiteSettings()]);
+	const [films, settings, facts] = await Promise.all([getFilms(), getSiteSettings(), getFacts()]);
+	const persona = settings.persona1;
 	return (
-		<div className="flex flex-col">
-			<div className="flex items-center justify-between gap-2 bg-surface-container-low px-5 py-2 md:mt-4 md:rounded-full md:px-6 dark:border-b dark:border-primary/10 md:dark:border">
-				<div className="flex min-w-0 items-center gap-1.5">
-					<span className="inline-block h-2 w-2 animate-pulse rounded-full bg-secondary dark:bg-primary" />
-					<span className="truncate font-mono text-label-mono text-secondary dark:text-primary-fixed-dim">REC [YOUTUBE / INSTAGRAM]</span>
-				</div>
-				<div className="flex shrink-0 items-center gap-1.5 rounded-full bg-surface-container-high px-2 py-0.5">
-					<Icon name="graphic_eq" className="text-[14px] text-on-surface-variant" />
-					<span className="font-mono text-label-mono text-on-surface-variant">Bengaluru</span>
-				</div>
-			</div>
-
-			<section className="flex flex-col gap-2 px-5 pt-4 md:px-8">
-				<ReelPlayer video={settings.reel.video || undefined} poster={settings.reel.poster} />
-				<div className="flex items-center justify-between gap-2 rounded-lg bg-surface-container px-3.5 py-2.5 shadow-sm dark:border dark:border-primary/10">
-					<div className="flex min-w-0 items-center gap-2">
-						<Icon name="videocam" className="text-[20px] text-secondary dark:text-primary" />
-						<p className="truncate font-mono text-label-mono text-on-surface">
-							YouTube films &amp; Instagram reels{" "}
-							<span className="font-normal text-on-surface-variant">{"// stills and short motion"}</span>
-						</p>
+		<div className="flex flex-col gap-8 px-5 pb-12 pt-6 md:px-8">
+			<header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+				<div className="flex max-w-2xl flex-col gap-2">
+					<div className="flex items-center gap-2">
+						<span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+						<span className="font-mono text-label-mono uppercase tracking-widest text-secondary dark:text-primary-fixed-dim">{persona.role}</span>
 					</div>
-					<span className="shrink-0 font-mono text-[11px] font-bold text-secondary dark:text-tertiary">A-CAM</span>
+					<h1 className="font-serif text-display-hero-mobile italic tracking-tight text-on-surface md:text-[56px] md:leading-[1.05]">{persona.headline}</h1>
+					<p className="font-sans text-body-default text-on-surface-variant">{persona.body}</p>
 				</div>
-			</section>
+				<div className="flex flex-wrap items-center gap-2">
+					<a
+						href={settings.socials.youtube.href}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 font-sans text-label-pill font-bold text-white shadow-sm transition-all hover:brightness-110 active:scale-95"
+					>
+						<Icon name="play_circle" className="text-[18px]" filled />
+						YouTube
+					</a>
+					<a
+						href={settings.socials.instagram.href}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="inline-flex items-center gap-1.5 rounded-full bg-linear-to-tr from-amber-400 via-pink-500 to-purple-600 px-4 py-2 font-sans text-label-pill font-bold text-white shadow-sm transition-all hover:brightness-110 active:scale-95"
+					>
+						<Icon name="photo_camera" className="text-[18px]" filled />
+						Instagram
+					</a>
+					<span className="inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-2 font-mono text-label-mono text-on-surface-variant">
+						<Icon name="location_on" className="text-[16px] text-secondary dark:text-primary" />
+						{settings.location}
+					</span>
+				</div>
+			</header>
 
-			<div className="flex items-end justify-between px-5 pb-1 pt-6 md:px-8">
-				<div>
-					<span className="font-mono text-label-mono uppercase text-secondary dark:text-primary-fixed-dim">Selected Picture Work</span>
-					<h2 className="font-serif text-headline-lg font-medium text-on-surface">YouTube, Reels &amp; Stills</h2>
-				</div>
-				<span className="font-mono text-label-mono text-on-surface-variant">{films.length} Case Studies</span>
+			<ReelPlayer video={settings.reel.video || undefined} poster={settings.reel.poster} />
+
+			<FactDeck label="From the edit bay" facts={facts.cinema} />
+
+			<div className="flex flex-col gap-1">
+				<span className="font-mono text-label-mono uppercase tracking-widest text-secondary dark:text-primary-fixed-dim">Picture work</span>
+				<h2 className="font-serif text-headline-lg text-on-surface">Pick a section, or browse them all</h2>
 			</div>
 
-			<div className="grid gap-4 px-5 pb-6 pt-3 md:px-8 lg:grid-cols-2">
-				{films.map((film) => (
-					<FilmCard key={film.slug} film={film} />
-				))}
-			</div>
+			<CinemaBrowser films={films} youtubeHref={settings.socials.youtube.href} instagramHref={settings.socials.instagram.href} />
 
-			<section className="px-5 pb-4 md:px-8">
+			<section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1.4fr]">
 				<Link
 					href="/shop"
-					className="group flex items-center justify-between gap-4 rounded-xl bg-primary-container p-5 text-on-primary-container shadow-lg transition-all hover:brightness-110 active:scale-[0.99] dark:shadow-glow"
+					className="group flex flex-col justify-between gap-6 rounded-2xl bg-primary-container p-6 text-on-primary-container shadow-lg transition-all hover:brightness-110 active:scale-[0.99] dark:shadow-glow"
 				>
-					<div className="flex items-center gap-3">
-						<span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
-							<Icon name="palette" className="text-[22px]" />
-						</span>
+					<span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 text-white">
+						<Icon name="palette" className="text-[22px]" />
+					</span>
+					<div className="flex items-end justify-between gap-3">
 						<div>
 							<span className="font-mono text-label-mono uppercase text-tertiary-fixed">LUT Shop</span>
 							<p className="font-headline text-headline-sm font-semibold text-white">Grade your footage like these reels</p>
 						</div>
+						<Icon name="arrow_forward" className="text-[22px] text-white transition-transform group-hover:translate-x-1" />
 					</div>
-					<Icon name="arrow_forward" className="text-[22px] text-white transition-transform group-hover:translate-x-1" />
 				</Link>
-			</section>
 
-			<section className="px-5 pb-12 md:px-8">
-				<div className="flex flex-col gap-2 rounded-xl bg-surface-container-high p-6 shadow-md dark:border dark:border-primary/20 dark:bg-surface-container">
+				<div className="flex flex-col gap-2 rounded-2xl bg-surface-container-high p-6 shadow-md dark:border dark:border-primary/20 dark:bg-surface-container">
 					<div className="flex items-center gap-2">
-						<Icon name="calendar_today" className="text-[24px] text-secondary dark:text-primary" />
-						<span className="font-mono text-label-mono uppercase text-secondary dark:text-primary-fixed-dim">Availability Calendar</span>
+						<Icon name="calendar_today" className="text-[22px] text-secondary dark:text-primary" />
+						<span className="font-mono text-label-mono uppercase text-secondary dark:text-primary-fixed-dim">Bookings</span>
 					</div>
 					<h3 className="font-headline text-headline-md font-bold text-on-surface">Book a shoot, an edit, or both</h3>
-					<p className="max-w-2xl font-sans text-body-default text-on-surface-variant">
-						Based in Bengaluru, available on location and remote. Reels and motion are cut in DaVinci Resolve and Premiere Pro. Stills are
-						finished in Lightroom.
+					<p className="font-sans text-body-default text-on-surface-variant">
+						Based in {settings.location}. Reels and motion are cut in DaVinci Resolve and Premiere Pro; stills are finished in Lightroom.
 					</p>
-					<div className="flex flex-col gap-2 pt-2 sm:flex-row">
+					<div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row">
 						<Link
 							href="/about#commission-cinema"
 							className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-3 font-sans text-label-pill font-bold text-on-primary shadow-md transition-transform active:translate-y-0.5 dark:shadow-glow"
 						>
-							Request a Shoot
+							Request a shoot
 							<Icon name="arrow_forward" className="text-[18px]" />
 						</Link>
 						<a
@@ -98,7 +105,7 @@ export default async function CinemaPage() {
 							className="flex w-full items-center justify-center gap-2 rounded-full bg-surface-container-lowest px-4 py-3 font-sans text-label-pill font-bold text-on-surface shadow-sm transition-colors hover:bg-surface-container"
 						>
 							<Icon name="download" className="text-[18px]" />
-							Download Shoot Notes (PDF)
+							Shoot notes (PDF)
 						</a>
 					</div>
 				</div>

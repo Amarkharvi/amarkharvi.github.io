@@ -1,14 +1,15 @@
 import { cacheTag } from "next/cache";
-import { defaultCredentials, defaultFilms, defaultTechStack } from "./content-data";
+import { defaultCredentials, defaultFilms, defaultTechStack, normalizeFilm } from "./content-data";
 
-export type { Credential, Credentials, Film, Repo, TechStackGroup, TechStackItem } from "./content-data";
-export { defaultCredentials, defaultFilms, defaultTechStack, repos } from "./content-data";
+export type { Credential, Credentials, Film, FilmMedia, Repo, TechStackGroup, TechStackItem } from "./content-data";
+export { defaultCredentials, defaultFilms, defaultTechStack, mediaKindOf, normalizeFilm, repos } from "./content-data";
 
 export async function getFilms(): Promise<import("./content-data").Film[]> {
 	"use cache";
 	cacheTag("content:films");
 	const { readContent } = await import("./content-store");
-	return readContent("films", defaultFilms);
+	const films = await readContent("films", defaultFilms);
+	return films.map((film) => normalizeFilm(film));
 }
 
 export async function saveFilms(films: import("./content-data").Film[]): Promise<void> {

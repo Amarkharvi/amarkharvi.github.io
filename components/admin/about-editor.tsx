@@ -24,7 +24,7 @@ export function AboutEditor({ initialContent, media }: { initialContent: AboutCo
 				<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Hero</span>
 				<MediaPicker label="Profile / hero image" value={about.heroImage} onChange={(value) => update({ heroImage: value })} media={media} />
 				<Field label="Image alt text" value={about.heroImageAlt} onChange={(value) => update({ heroImageAlt: value })} />
-				<div className="grid gap-3 md:grid-cols-2">
+				<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<Field label="Badge (top-left pill)" value={about.heroBadge} onChange={(value) => update({ heroBadge: value })} />
 					<Field label="Chip (top-right tag)" value={about.heroChip} onChange={(value) => update({ heroChip: value })} />
 					<Field label="Overlay tag (on the image)" value={about.heroOverlayTag} onChange={(value) => update({ heroOverlayTag: value })} />
@@ -44,7 +44,7 @@ export function AboutEditor({ initialContent, media }: { initialContent: AboutCo
 				<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">Home base</span>
 				<MediaPicker label="Map / location image" value={about.homeBaseImage} onChange={(value) => update({ homeBaseImage: value })} media={media} />
 				<Field label="Image alt text" value={about.homeBaseImageAlt} onChange={(value) => update({ homeBaseImageAlt: value })} />
-				<div className="grid gap-3 md:grid-cols-2">
+				<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 					<Field label="Map tag" value={about.homeBaseMapTag} onChange={(value) => update({ homeBaseMapTag: value })} />
 					<Field label="Title" value={about.homeBaseTitle} onChange={(value) => update({ homeBaseTitle: value })} />
 				</div>

@@ -17,7 +17,7 @@ export function BottomNavView({ pathname }: { pathname: string | null }) {
 	return (
 		<nav
 			aria-label="Primary"
-			className="pb-safe fixed inset-x-0 bottom-0 z-50 bg-surface/90 shadow-[0_-1px_12px_rgba(40,30,160,0.06)] backdrop-blur-xl md:hidden dark:border-t dark:border-primary/10 dark:shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
+			className="pb-safe fixed inset-x-0 bottom-0 z-50 bg-surface/94 shadow-[0_-1px_12px_rgba(40,30,160,0.06)] backdrop-blur-md md:hidden dark:border-t dark:border-primary/10 dark:bg-surface/90 dark:shadow-[0_-4px_24px_rgba(0,0,0,0.5)]"
 		>
 			<div className="flex h-16 items-center justify-around px-1">
 				{navItems.map((item) => {

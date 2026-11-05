@@ -11,6 +11,10 @@ export type Product = {
 	image: string;
 	imageAlt: string;
 	preview: string;
+	/** Ungraded photo for the before/after slider. Needs `after` too; otherwise the CSS preview filter is used. */
+	before?: string;
+	/** The same photo with this LUT applied. */
+	after?: string;
 	files: LutFile[];
 	bestFor: string[];
 };

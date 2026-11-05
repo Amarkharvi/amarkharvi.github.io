@@ -1,6 +1,6 @@
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/cn";
-import type { Repo } from "@/lib/content";
+import type { Repo } from "@/lib/content-data";
 
 const iconTones: Record<Repo["iconTone"], string> = {
 	primary: "bg-primary-fixed text-on-primary-fixed",
@@ -18,18 +18,18 @@ const tagTones: Record<Repo["tagTone"], string> = {
 
 export function RepoCard({ repo }: { repo: Repo }) {
 	return (
-		<article className="flex flex-col gap-2 rounded-xl bg-surface-container-lowest p-4 shadow-sm transition-shadow hover:shadow-md dark:border dark:border-primary/10 dark:bg-surface-container-low dark:hover:border-primary/40 dark:hover:shadow-glow">
+		<article className="flex min-w-0 flex-col gap-2 rounded-xl bg-surface-container-lowest p-4 shadow-sm transition-shadow hover:shadow-md dark:border dark:border-primary/10 dark:bg-surface-container-low dark:hover:border-primary/40 dark:hover:shadow-glow">
 			<div className="flex items-start justify-between gap-2">
-				<div className="flex items-center gap-2">
-					<span className={cn("flex h-8 w-8 items-center justify-center rounded-lg", iconTones[repo.iconTone])}>
+				<div className="flex min-w-0 items-center gap-2">
+					<span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", iconTones[repo.iconTone])}>
 						<Icon name={repo.icon} className="text-[18px]" />
 					</span>
-					<div className="flex flex-col">
-						<span className="font-mono text-[14px] font-bold text-on-surface">{repo.name}</span>
+					<div className="flex min-w-0 flex-col">
+						<span className="font-mono text-[14px] font-bold text-on-surface wrap-anywhere">{repo.name}</span>
 						<span className="font-sans text-[11px] font-medium text-on-surface-variant">{repo.subtitle}</span>
 					</div>
 				</div>
-				<span className="flex items-center gap-1 rounded-full bg-surface-container-high px-2 py-0.5 font-mono text-[11px] text-on-surface">
+				<span className="flex shrink-0 items-center gap-1 rounded-full bg-surface-container-high px-2 py-0.5 font-mono text-[11px] text-on-surface">
 					<Icon name="code" className="text-[13px] text-secondary" />
 					<span className="font-semibold">{repo.meta}</span>
 				</span>

@@ -17,37 +17,11 @@ function formatTimecode(totalFrames: number) {
 	return [hours, minutes, seconds, frames].map((n) => String(n).padStart(2, "0")).join(":");
 }
 
-function createRainAmbience(ctx: AudioContext) {
-	const length = ctx.sampleRate * 4;
-	const buffer = ctx.createBuffer(2, length, ctx.sampleRate);
-	for (let channel = 0; channel < 2; channel++) {
-		const data = buffer.getChannelData(channel);
-		let last = 0;
-		for (let i = 0; i < length; i++) {
-			const white = Math.random() * 2 - 1;
-			last = (last + 0.02 * white) / 1.02;
-			data[i] = last * 3.2 + white * 0.04;
-		}
-	}
-	const source = ctx.createBufferSource();
-	source.buffer = buffer;
-	source.loop = true;
-	const filter = ctx.createBiquadFilter();
-	filter.type = "lowpass";
-	filter.frequency.value = 1400;
-	const gain = ctx.createGain();
-	gain.gain.value = 0.35;
-	source.connect(filter).connect(gain).connect(ctx.destination);
-	source.start();
-	return { source, gain };
-}
-
 export function ReelPlayer({ video, poster }: { video?: string; poster?: string }) {
 	const [playing, setPlaying] = useState(false);
 	const [frame, setFrame] = useState(START_FRAME);
-	const [soundOn, setSoundOn] = useState(false);
+	const [muted, setMuted] = useState(false);
 	const frameRef = useRef(START_FRAME);
-	const audioRef = useRef<{ ctx: AudioContext; gain: GainNode } | null>(null);
 	const videoRef = useRef<HTMLVideoElement>(null);
 	const posterSrc = poster || "/media/work/quiet-moments-train.png";
 
@@ -71,36 +45,23 @@ export function ReelPlayer({ video, poster }: { video?: string; poster?: string 
 		return () => cancelAnimationFrame(raf);
 	}, [playing, video]);
 
-	useEffect(() => {
-		return () => {
-			audioRef.current?.ctx.close();
-		};
-	}, []);
-
-	async function toggleSound() {
-		if (!audioRef.current) {
-			const ctx = new AudioContext();
-			const { gain } = createRainAmbience(ctx);
-			audioRef.current = { ctx, gain };
-			setSoundOn(true);
-			return;
-		}
-		const { ctx } = audioRef.current;
-		if (ctx.state === "running") {
-			await ctx.suspend();
-			setSoundOn(false);
-		} else {
-			await ctx.resume();
-			setSoundOn(true);
-		}
+	function toggleSound() {
+		const clip = videoRef.current;
+		if (!clip) return;
+		clip.muted = !clip.muted;
+		setMuted(clip.muted);
 	}
 
 	function togglePlaying() {
-		if (video && videoRef.current) {
-			if (playing) videoRef.current.pause();
-			else videoRef.current.play().catch(() => {});
+		const clip = videoRef.current;
+		if (video && clip) {
+			if (playing) clip.pause();
+			else {
+				clip.muted = muted;
+				clip.play().catch(() => {});
+			}
 		}
-		setPlaying((p) => !p);
+		setPlaying((current) => !current);
 	}
 
 	return (
@@ -110,7 +71,6 @@ export function ReelPlayer({ video, poster }: { video?: string; poster?: string 
 					ref={videoRef}
 					src={video}
 					poster={posterSrc}
-					muted
 					loop
 					playsInline
 					onTimeUpdate={(event) => setFrame(START_FRAME + Math.floor(event.currentTarget.currentTime * FPS))}
@@ -154,19 +114,21 @@ export function ReelPlayer({ video, poster }: { video?: string; poster?: string 
 			<div className="relative z-10 mb-3 flex items-center justify-between rounded-lg bg-black/65 px-2.5 py-1.5 text-white backdrop-blur-md">
 				<div className="flex min-w-0 items-center gap-1.5">
 					<Icon name="headphones" className="text-[16px] text-secondary-container dark:text-tertiary" />
-					<span className="truncate font-mono text-[11px]">Soft room tone</span>
+					<span className="truncate font-mono text-[11px]">{video ? "Showreel audio" : "Still frame"}</span>
 				</div>
 				<div className="flex shrink-0 items-center gap-2">
-					<button
-						type="button"
-						onClick={toggleSound}
-						aria-pressed={soundOn}
-						aria-label={soundOn ? "Mute ambience" : "Play ambience"}
-						className="flex h-7 w-7 items-center justify-center rounded transition-colors hover:text-secondary-container dark:hover:text-tertiary"
-					>
-						<Icon name={soundOn ? "volume_up" : "volume_off"} className="text-[16px]" />
-					</button>
-					<span className="font-mono text-[10px] text-white/60">L/R STEREO</span>
+					{video ? (
+						<button
+							type="button"
+							onClick={toggleSound}
+							aria-pressed={!muted}
+							aria-label={muted ? "Unmute showreel" : "Mute showreel"}
+							className="flex h-7 w-7 items-center justify-center rounded transition-colors hover:text-secondary-container dark:hover:text-tertiary"
+						>
+							<Icon name={muted ? "volume_off" : "volume_up"} className="text-[16px]" />
+						</button>
+					) : null}
+					<span className="font-mono text-[10px] text-white/60">{video ? "L/R STEREO" : "NO AUDIO"}</span>
 				</div>
 			</div>
 		</div>

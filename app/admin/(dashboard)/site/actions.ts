@@ -1,8 +1,8 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
-import { saveSiteSettings, type SiteSettings } from "@/lib/site-settings";
+import { revalidatePublicSite } from "@/lib/admin/revalidate-site";
+import { isOrderChannel, saveSiteSettings, type SiteSettings } from "@/lib/site-settings";
 
 export type SiteFormState = { error: string | null; saved: boolean };
 
@@ -24,6 +24,29 @@ function isSwipe(value: unknown): boolean {
 	return typeof swipe.reel === "string" && typeof swipe.product === "string" && typeof swipe.portrait === "string";
 }
 
+function isPersona(value: unknown): boolean {
+	if (!value || typeof value !== "object") return false;
+	const persona = value as Record<string, unknown>;
+	return (
+		typeof persona.badge === "string" &&
+		typeof persona.role === "string" &&
+		typeof persona.headline === "string" &&
+		typeof persona.body === "string" &&
+		typeof persona.tools === "string" &&
+		typeof persona.ctaLabel === "string" &&
+		typeof persona.ctaHref === "string" &&
+		typeof persona.columnEyebrow === "string" &&
+		typeof persona.columnTitle === "string" &&
+		typeof persona.featureTitle === "string" &&
+		typeof persona.featureBody === "string" &&
+		typeof persona.featureChips === "string" &&
+		typeof persona.featureHref === "string" &&
+		typeof persona.featureLinkLabel === "string" &&
+		typeof persona.featureMedia === "string" &&
+		typeof persona.featurePoster === "string"
+	);
+}
+
 function isSettings(value: unknown): value is SiteSettings {
 	if (!value || typeof value !== "object") return false;
 	const settings = value as Record<string, unknown>;
@@ -34,11 +57,14 @@ function isSettings(value: unknown): value is SiteSettings {
 		typeof settings.location !== "string" ||
 		typeof settings.role !== "string" ||
 		typeof settings.whatsapp !== "string" ||
+		!isOrderChannel(settings.orderChannel) ||
 		typeof settings.introHeading !== "string" ||
 		typeof settings.introSubheading !== "string" ||
 		typeof settings.introParagraph !== "string" ||
 		!isSwipe(settings.swipe) ||
-		!isReel(settings.reel)
+		!isReel(settings.reel) ||
+		!isPersona(settings.persona1) ||
+		!isPersona(settings.persona2)
 	) {
 		return false;
 	}
@@ -67,9 +93,7 @@ export async function saveSiteSettingsAction(_prevState: SiteFormState, formData
 	}
 
 	await saveSiteSettings(parsed);
-	revalidateTag("content:site-settings", { expire: 0 });
-	revalidatePath("/");
-	revalidatePath("/cinema");
+	revalidatePublicSite(["content:site-settings"]);
 
 	return { error: null, saved: true };
 }

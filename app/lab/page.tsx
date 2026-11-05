@@ -4,8 +4,10 @@ import { LabHero } from "@/components/lab/lab-hero";
 import { PalladiumCanvas } from "@/components/lab/palladium-canvas";
 import { PapersTerminal } from "@/components/lab/papers-terminal";
 import { RepoCard } from "@/components/lab/repo-card";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
 import { getTechStack, repos } from "@/lib/content";
+import { getFacts } from "@/lib/facts";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
 
@@ -23,30 +25,30 @@ const metrics = [
 const CANVAS_ID = "compute-canvas";
 
 export default async function LabPage() {
-	const techStack = await getTechStack();
+	const [techStack, facts] = await Promise.all([getTechStack(), getFacts()]);
 	return (
 		<div className="flex flex-col gap-6 px-4 py-2 md:px-8 md:py-4">
 			<div className="flex items-center justify-between rounded-full bg-surface-container-high p-1.5 shadow-inner md:max-w-xl dark:border dark:border-primary/20 dark:bg-surface-container-low">
 				<div className="flex items-center gap-1">
-					<span className="flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 font-sans text-label-pill font-bold text-on-surface shadow-sm dark:bg-primary dark:text-on-primary dark:shadow-glow">
+					<span className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-surface px-3 py-1 font-sans text-label-pill font-bold text-on-surface shadow-sm dark:bg-primary dark:text-on-primary dark:shadow-glow">
 						<Icon name="terminal" className="text-[14px] text-primary dark:text-on-primary" />
-						Developer Mode
+						Developer<span className="hidden sm:inline"> Mode</span>
 					</span>
 					<Link
 						href="/cinema"
-						className="flex items-center gap-1.5 rounded-full px-3 py-1 font-sans text-label-pill font-bold text-on-surface-variant transition-colors hover:text-on-surface"
+						className="flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 font-sans text-label-pill font-bold text-on-surface-variant transition-colors hover:text-on-surface"
 					>
 						<Icon name="movie" className="text-[14px]" />
-						Cinema Mode
+						Cinema<span className="hidden sm:inline"> Mode</span>
 					</Link>
 				</div>
-				<div className="flex items-center gap-1 pr-2 font-mono text-tertiary">
+				<div className="hidden items-center gap-1 pr-2 font-mono text-tertiary min-[380px]:flex">
 					<span className="h-2 w-2 animate-ping rounded-full bg-tertiary-fixed-dim" />
 					<span className="text-[11px] font-bold">NODE_ONLINE</span>
 				</div>
 			</div>
 
-			<div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.1fr_1fr]">
 				<div className="flex flex-col gap-6">
 					<LabHero canvasId={CANVAS_ID} />
 					<div className="grid grid-cols-3 gap-2">
@@ -71,7 +73,7 @@ export default async function LabPage() {
 							<span className="font-mono text-[11px] text-on-surface-variant">{site.location}</span>
 						</div>
 						<p className="font-sans text-[12px] leading-relaxed text-on-surface-variant">
-							Currently shipping this dual-persona portfolio in Next.js 16 — the same person writing the backend and grading the reel.
+							Currently shipping this dual-persona portfolio in Next.js 16 — the same person writing the backend and grading the reel. I keep a fact nearby while I do it. One true sentence, then back to the work.
 						</p>
 						<div className="flex items-center gap-2 pt-1">
 							<a
@@ -105,7 +107,7 @@ export default async function LabPage() {
 					<span className="rounded bg-primary px-2 py-0.5 font-mono text-[10px] text-on-primary">Browser</span>
 					</div>
 					<PalladiumCanvas id={CANVAS_ID} />
-					<div className="flex items-center justify-between px-1 font-mono text-[11px] text-on-surface-variant">
+					<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 font-mono text-[11px] text-on-surface-variant">
 						<span>Palladium · shells 2 · 8 · 18 · 18 · 0</span>
 						<span>Bohr-style sketch, not real orbitals</span>
 					</div>
@@ -118,7 +120,13 @@ export default async function LabPage() {
 				</div>
 			</div>
 
-			<div className="grid gap-6 lg:grid-cols-2">
+			<FactDeck
+				label="Knowledge bites"
+				note="I collect these the way a feed collects hooks: short enough to finish, strange enough to keep. They move on their own. Hover, or use the arrows, when you want to stay."
+				facts={facts.lab}
+			/>
+
+			<div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 				<div className="flex flex-col gap-3 rounded-2xl bg-surface-container-lowest p-4 shadow-sm dark:border dark:border-primary/10 dark:bg-surface-container-low">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2">
@@ -198,7 +206,7 @@ export default async function LabPage() {
 					</div>
 					<span className="font-mono text-[11px] text-on-surface-variant">{repos.length} on GitHub</span>
 				</div>
-				<div className="grid gap-3 md:grid-cols-2">
+				<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 					{repos.map((repo) => (
 						<RepoCard key={repo.name} repo={repo} />
 					))}

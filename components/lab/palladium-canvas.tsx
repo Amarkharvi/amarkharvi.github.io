@@ -61,6 +61,19 @@ export function PalladiumCanvas({ id }: { id?: string }) {
 	const targetRef = useRef(1);
 	const [paused, setPaused] = useState(false);
 	const [showActual, setShowActual] = useState(true);
+	const [inView, setInView] = useState(true);
+	const running = !paused && inView;
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const observer = new IntersectionObserver(
+			([entry]) => setInView(entry.isIntersecting),
+			{ root: null, rootMargin: "120px 0px", threshold: 0.05 },
+		);
+		observer.observe(canvas);
+		return () => observer.disconnect();
+	}, []);
 
 	useEffect(() => {
 		targetRef.current = showActual ? 1 : 0;
@@ -245,20 +258,20 @@ export function PalladiumCanvas({ id }: { id?: string }) {
 				shownConfig = config;
 			}
 
-			if (!paused) raf = requestAnimationFrame(render);
+			if (running) raf = requestAnimationFrame(render);
 		};
 
-		if (paused) {
-			render(performance.now());
-		} else {
+		if (running) {
 			raf = requestAnimationFrame(render);
+		} else {
+			render(performance.now());
 		}
 
 		return () => {
 			cancelAnimationFrame(raf);
 			window.removeEventListener("resize", resize);
 		};
-	}, [paused, showActual]);
+	}, [running, showActual]);
 
 	return (
 		<div id={id} className="flex scroll-mt-24 flex-col gap-3">

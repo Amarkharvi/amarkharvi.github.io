@@ -1,7 +1,7 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
+import { revalidatePublicSite } from "@/lib/admin/revalidate-site";
 import { saveProducts, type Product } from "@/lib/products";
 
 export type ProductsFormState = { error: string | null; saved: boolean };
@@ -17,7 +17,9 @@ function isProduct(value: unknown): value is Product {
 		product.price >= 0 &&
 		typeof product.image === "string" &&
 		Array.isArray(product.files) &&
-		Array.isArray(product.bestFor)
+		Array.isArray(product.bestFor) &&
+		(product.before === undefined || typeof product.before === "string") &&
+		(product.after === undefined || typeof product.after === "string")
 	);
 }
 
@@ -42,8 +44,7 @@ export async function saveProductsAction(_prevState: ProductsFormState, formData
 	}
 
 	await saveProducts(parsed);
-	revalidateTag("content:products", { expire: 0 });
-	revalidatePath("/shop");
+	revalidatePublicSite(["content:products"]);
 
 	return { error: null, saved: true };
 }

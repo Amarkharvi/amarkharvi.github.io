@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { InquiryForms } from "@/components/about/inquiry-forms";
 import { CopyButton } from "@/components/ui/copy-button";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
+import { getFacts } from "@/lib/facts";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { TiltCard } from "@/components/ui/tilt-card";
@@ -23,7 +25,7 @@ const portfolios = [
 ];
 
 export default async function AboutPage() {
-	const [credentials, settings, about] = await Promise.all([getCredentials(), getSiteSettings(), getAboutContent()]);
+	const [credentials, settings, about, facts] = await Promise.all([getCredentials(), getSiteSettings(), getAboutContent(), getFacts()]);
 	const pedigree = [
 		{ key: "cinema", icon: "movie_filter", title: "Picture work", track: "REELS & STILLS", items: credentials.cinema, tone: "text-secondary", chip: "bg-secondary-fixed text-on-secondary-fixed" },
 		{ key: "engineering", icon: "terminal", title: "Full stack", track: "PRODUCT TRACK", items: credentials.engineering, tone: "text-primary", chip: "bg-primary-fixed text-on-primary-fixed" },
@@ -35,7 +37,7 @@ export default async function AboutPage() {
 	];
 	return (
 		<div className="flex flex-col gap-10 px-4 py-4 md:px-8">
-			<section className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+			<section className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-end">
 				<div className="flex flex-col gap-3">
 					<div className="flex flex-wrap items-center gap-2">
 						<span className="rounded-full bg-tertiary-fixed px-3 py-1 font-mono text-[11px] font-bold tracking-wider text-on-tertiary-fixed">{about.heroBadge}</span>
@@ -62,9 +64,11 @@ export default async function AboutPage() {
 				</Reveal>
 			</section>
 
+			<FactDeck label="How I keep learning" facts={facts.about} />
+
 			<section className="flex flex-col gap-4">
 				<SectionHeading title="Two practices" aside={<span className="font-mono text-label-mono text-outline">BENGALURU</span>} />
-				<div className="grid gap-4 md:grid-cols-2">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 					{pedigree.map((track, index) => (
 						<Reveal
 							key={track.key}
@@ -97,7 +101,7 @@ export default async function AboutPage() {
 
 			<section className="flex flex-col gap-4">
 				<SectionHeading title="Notes you can download" />
-				<div className="grid gap-3 md:grid-cols-2">
+				<div className="grid grid-cols-1 gap-3 md:grid-cols-2">
 					{portfolios.map(({ icon, title, doc }) => (
 						<a
 							key={doc.href}

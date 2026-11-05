@@ -21,10 +21,7 @@ export const viewport: Viewport = {
 	width: "device-width",
 	initialScale: 1,
 	viewportFit: "cover",
-	themeColor: [
-		{ media: "(prefers-color-scheme: light)", color: "#f7f8ff" },
-		{ media: "(prefers-color-scheme: dark)", color: "#090b1f" },
-	],
+	themeColor: "#f7f8ff",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -32,6 +29,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 	return (
 		<html
 			lang="en"
+			data-theme="light"
 			suppressHydrationWarning
 			className="antialiased"
 		>
@@ -39,24 +37,25 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 				<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
 			</head>
 			<body className="flex min-h-dvh flex-col">
-				<SmoothScroll />
-				<MotionProvider>
-					<a
-						href="#main"
-						className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary"
-					>
-						Skip to content
-					</a>
-					<Suspense fallback={<SiteHeaderView pathname={null} tagline={settings.tagline} availability={settings.availability} />}>
-						<SiteHeader tagline={settings.tagline} availability={settings.availability} />
-					</Suspense>
-					<main id="main" className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col pb-24 pt-16 md:pb-12">
-						{children}
-					</main>
-					<Suspense fallback={<BottomNavView pathname={null} />}>
-						<BottomNav />
-					</Suspense>
-				</MotionProvider>
+				<SmoothScroll>
+					<MotionProvider>
+						<a
+							href="#main"
+							className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary"
+						>
+							Skip to content
+						</a>
+						<Suspense fallback={<SiteHeaderView pathname={null} tagline={settings.tagline} availability={settings.availability} />}>
+							<SiteHeader tagline={settings.tagline} availability={settings.availability} />
+						</Suspense>
+						<main id="main" className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col pb-24 pt-16 md:pb-12">
+							{children}
+						</main>
+						<Suspense fallback={<BottomNavView pathname={null} />}>
+							<BottomNav />
+						</Suspense>
+					</MotionProvider>
+				</SmoothScroll>
 			</body>
 		</html>
 	);

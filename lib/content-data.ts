@@ -1,3 +1,10 @@
+export type FilmMedia = {
+	src: string;
+	alt: string;
+	/** Defaults from the file extension when omitted. */
+	kind?: "image" | "video";
+};
+
 export type Film = {
 	slug: string;
 	index: string;
@@ -10,9 +17,48 @@ export type Film = {
 	focal: string;
 	specs: [{ label: string; value: string }, { label: string; value: string }];
 	note: string;
-	stills: [{ src: string; alt: string }, { src: string; alt: string }];
+	/** Photos and short reels in the card. Keep at least three. */
+	gallery: FilmMedia[];
+	/** Unique CTA that opens notes and watch links — avoid repeating the same line on every card. */
+	expandLabel?: string;
 	studyHref?: string;
+	youtubeHref?: string;
+	instagramHref?: string;
 };
+
+export function mediaKindOf(src: string, kind?: FilmMedia["kind"]): "image" | "video" {
+	if (kind === "image" || kind === "video") return kind;
+	return /\.(mp4|webm|mov)(\?|$)/i.test(src) ? "video" : "image";
+}
+
+/** Accepts older saves that only had two `stills`, and pads a short gallery with the cover. */
+export function normalizeFilm(raw: Film & { stills?: FilmMedia[] }): Film {
+	const fromLegacy = Array.isArray(raw.stills) ? raw.stills : [];
+	const gallery = (Array.isArray(raw.gallery) && raw.gallery.length > 0 ? raw.gallery : fromLegacy)
+		.filter((item) => item && typeof item.src === "string" && item.src.trim())
+		.map((item) => ({
+			src: item.src.trim(),
+			alt: typeof item.alt === "string" ? item.alt : "",
+			kind: mediaKindOf(item.src, item.kind),
+		}));
+	if (gallery.length < 3 && raw.cover?.trim()) {
+		const coverSrc = raw.cover.trim();
+		if (!gallery.some((item) => item.src === coverSrc)) {
+			gallery.push({ src: coverSrc, alt: `${raw.title || "Picture"} cover frame`, kind: "image" });
+		}
+	}
+	while (gallery.length < 3 && gallery.length > 0) {
+		gallery.push({ ...gallery[gallery.length - 1] });
+	}
+	return {
+		...raw,
+		gallery,
+		expandLabel: raw.expandLabel?.trim() || `Explore ${raw.title || "this set"}`,
+		studyHref: raw.studyHref || "",
+		youtubeHref: raw.youtubeHref || "",
+		instagramHref: raw.instagramHref || "",
+	};
+}
 
 export const defaultFilms: Film[] = [
 	{
@@ -30,11 +76,15 @@ export const defaultFilms: Film[] = [
 			{ label: "Delivery", value: "YouTube and Instagram" },
 		],
 		note: "Longer cuts go to YouTube. The reel cut is for Instagram: a clear opening image, a rhythm that matches the track, and an end card that still reads on a phone.",
-		stills: [
-			{ src: "/media/cinema/quiet-moments-hands.jpg", alt: "Close detail frame used as a reel cutaway" },
-			{ src: "/media/cinema/quiet-moments-roofs.jpg", alt: "Wide frame held for a slower beat in an edit" },
+		gallery: [
+			{ src: "/media/cinema/quiet-moments-hands.jpg", alt: "Close detail frame used as a reel cutaway", kind: "image" },
+			{ src: "/media/cinema/quiet-moments-roofs.jpg", alt: "Wide frame held for a slower beat in an edit", kind: "image" },
+			{ src: "/media/cinema/quiet-moments-cover.jpg", alt: "Window-light hero frame from the reel study", kind: "image" },
 		],
+		expandLabel: "Open the edit cut",
 		studyHref: "/cinema/quiet-moments",
+		youtubeHref: "",
+		instagramHref: "",
 	},
 	{
 		slug: "product-shoots",
@@ -51,10 +101,14 @@ export const defaultFilms: Film[] = [
 			{ label: "Delivery", value: "Stills plus a short motion cut" },
 		],
 		note: "Product work stays on the object: clean edges, honest color, and a clip short enough to drop into a reel or a product page.",
-		stills: [
-			{ src: "/media/cinema/neon-monolith-chrome.jpg", alt: "Reflective surface used as a product-light reference" },
-			{ src: "/media/cinema/neon-monolith-runner.jpg", alt: "Motion frame with a strong backlight" },
+		gallery: [
+			{ src: "/media/cinema/neon-monolith-chrome.jpg", alt: "Reflective surface used as a product-light reference", kind: "image" },
+			{ src: "/media/cinema/neon-monolith-runner.jpg", alt: "Motion frame with a strong backlight", kind: "image" },
+			{ src: "/media/cinema/neon-monolith-cover.jpg", alt: "Night street cover used for the product mood", kind: "image" },
 		],
+		expandLabel: "Browse product frames",
+		youtubeHref: "",
+		instagramHref: "",
 	},
 	{
 		slug: "portraits",
@@ -71,10 +125,14 @@ export const defaultFilms: Film[] = [
 			{ label: "Use", value: "Profiles, campaigns, personal sets" },
 		],
 		note: "Portraits are about the person in the frame: a readable face, a background that stays quiet, and a grade that doesn't repaint skin.",
-		stills: [
-			{ src: "/media/cinema/symphony-of-rust-chain.jpg", alt: "Texture close-up kept as a portrait detail reference" },
-			{ src: "/media/cinema/symphony-of-rust-dockworker.jpg", alt: "Figure framed against a simple evening background" },
+		gallery: [
+			{ src: "/media/cinema/symphony-of-rust-chain.jpg", alt: "Texture close-up kept as a portrait detail reference", kind: "image" },
+			{ src: "/media/cinema/symphony-of-rust-dockworker.jpg", alt: "Figure framed against a simple evening background", kind: "image" },
+			{ src: "/media/cinema/symphony-of-rust-cover.jpg", alt: "Harbor light cover for the portrait set", kind: "image" },
 		],
+		expandLabel: "Meet the portrait set",
+		youtubeHref: "",
+		instagramHref: "",
 	},
 	{
 		slug: "grade-and-cut",
@@ -91,10 +149,14 @@ export const defaultFilms: Film[] = [
 			{ label: "Export", value: "Feed file and a client master" },
 		],
 		note: "The finish is where a shoot becomes a reel: trim in Premiere Pro or DaVinci Resolve, match the stills in Lightroom, then export a file that holds up on a phone and on a page.",
-		stills: [
-			{ src: "/media/cinema/threshold-dancer.jpg", alt: "Motion frame from a grade reference" },
-			{ src: "/media/cinema/threshold-piano.jpg", alt: "Low-key still used to check contrast in the grade" },
+		gallery: [
+			{ src: "/media/cinema/threshold-dancer.jpg", alt: "Motion frame from a grade reference", kind: "image" },
+			{ src: "/media/cinema/threshold-piano.jpg", alt: "Low-key still used to check contrast in the grade", kind: "image" },
+			{ src: "/media/cinema/threshold-cover.jpg", alt: "Stage light cover from the grade pass", kind: "image" },
 		],
+		expandLabel: "Inspect the grade pass",
+		youtubeHref: "",
+		instagramHref: "",
 	},
 ];
 

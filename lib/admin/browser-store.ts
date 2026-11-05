@@ -106,6 +106,9 @@ export function saveTechStackForm(prev: SaveState, formData: FormData) {
 export function saveCredentialsForm(prev: SaveState, formData: FormData) {
 	return saveJsonForm("credentials", "credentials", formData).then((state) => state ?? prev);
 }
+export function saveFactsForm(prev: SaveState, formData: FormData) {
+	return saveJsonForm("facts", "facts", formData).then((state) => state ?? prev);
+}
 
 export async function loadUploads(): Promise<UploadItem[]> {
 	if (IS_STATIC_SITE) return githubListUploads();

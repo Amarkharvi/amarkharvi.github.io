@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { Card, Field, SaveBar } from "@/components/admin/fields";
 import { Icon } from "@/components/ui/icon";
-import type { Credential, Credentials } from "@/lib/content";
+import type { Credential, Credentials } from "@/lib/content-data";
 import { saveCredentialsForm, type SaveState } from "@/lib/admin/browser-store";
 
 const initialState: SaveState = { error: null, saved: false };

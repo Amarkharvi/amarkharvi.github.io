@@ -5,7 +5,7 @@ import { getSiteSettings } from "@/lib/site-settings";
 export async function ContactCard() {
 	const settings = await getSiteSettings();
 	return (
-		<article className="flex flex-col gap-4 rounded-xl bg-surface-container-low p-5 shadow-card dark:border dark:border-primary/15">
+		<article className="flex h-full flex-col gap-4 rounded-2xl bg-surface-container-low p-6 shadow-card dark:border dark:border-primary/15">
 			<div className="flex items-start justify-between">
 				<div className="flex flex-col">
 					<span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-secondary dark:text-primary-fixed-dim">
@@ -20,7 +20,7 @@ export async function ContactCard() {
 			<p className="font-sans text-body-default text-on-surface-variant">
 				Open for reels and stills edited in Lightroom, DaVinci Resolve, and Premiere Pro, and for full-stack work in ColdFusion, Django, Python, SQL, and PostgreSQL.
 			</p>
-			<div className="flex flex-col gap-2 pt-1">
+			<div className="mt-auto flex flex-col gap-2 pt-1">
 				<div className="flex items-center gap-2">
 					<a
 						href={settings.socials.github.href}

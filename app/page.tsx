@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
+import { getFacts } from "@/lib/facts";
 import { Reveal } from "@/components/ui/reveal";
 import { CinemaColumn } from "@/components/work/cinema-column";
 import { ContactCard } from "@/components/work/contact-card";
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function WorkPage() {
-	const settings = await getSiteSettings();
+	const [settings, facts] = await Promise.all([getSiteSettings(), getFacts()]);
 	return (
 		<div className="flex flex-col gap-12 px-5 pb-8 pt-4 md:px-8">
 			<Reveal as="section" y={14} className="flex flex-col gap-6">
@@ -50,7 +52,9 @@ export default async function WorkPage() {
 
 			<PersonaSplit cinemaHero={<CinemaHero />} devHero={<DevHero />} cinemaColumn={<CinemaColumn />} devColumn={<DevColumn />} />
 
-			<Reveal as="section" className="grid gap-4 lg:grid-cols-3">
+			<FactDeck label="A fact between the two sides" facts={facts.home} />
+
+			<Reveal as="section" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
 				<div className="lg:col-span-2">
 					<MeetBand />
 				</div>

@@ -1,7 +1,7 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { assertAdmin } from "@/lib/admin/guard";
+import { revalidatePublicSite } from "@/lib/admin/revalidate-site";
 import { saveAboutContent, type AboutContent } from "@/lib/about";
 
 export type AboutFormState = { error: string | null; saved: boolean };
@@ -44,8 +44,7 @@ export async function saveAboutContentAction(_prevState: AboutFormState, formDat
 	}
 
 	await saveAboutContent(parsed);
-	revalidateTag("content:about", { expire: 0 });
-	revalidatePath("/about");
+	revalidatePublicSite(["content:about"]);
 
 	return { error: null, saved: true };
 }

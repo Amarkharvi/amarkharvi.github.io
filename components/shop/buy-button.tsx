@@ -4,32 +4,67 @@ import { useRef, useState, type FormEvent } from "react";
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/cn";
 import { EMAIL_PATTERN } from "@/lib/inquiry";
+import type { OrderChannel } from "@/lib/site-settings-data";
 
 function whatsappDigits(value: string) {
 	return value.replace(/\D/g, "");
 }
 
+const channelCopy: Record<OrderChannel, { name: string; icon: string; submit: string; button: string; pill: string }> = {
+	instagram: {
+		name: "Instagram",
+		icon: "photo_camera",
+		submit: "Open Instagram chat",
+		button: "bg-linear-to-tr from-amber-400 via-pink-500 to-purple-600 text-white",
+		pill: "bg-linear-to-tr from-amber-400 via-pink-500 to-purple-600 text-white",
+	},
+	whatsapp: {
+		name: "WhatsApp",
+		icon: "chat",
+		submit: "Send order on WhatsApp",
+		button: "bg-[#25D366] text-white",
+		pill: "bg-[#25D366] text-white",
+	},
+};
+
 export function BuyButton({
 	productName,
 	priceLabel,
 	files,
+	channel,
 	whatsapp,
+	instagram,
 	featured,
 }: {
 	productName: string;
 	priceLabel: string;
 	files: string[];
+	channel: OrderChannel;
 	whatsapp: string;
+	/** Instagram username (no @) that receives the DM when `channel` is "instagram". */
+	instagram: string;
 	featured?: boolean;
 }) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const [message, setMessage] = useState<string | null>(null);
-	const [sent, setSent] = useState(false);
+	const [sentText, setSentText] = useState<string | null>(null);
+	const [copied, setCopied] = useState(false);
 	const number = whatsappDigits(whatsapp);
+	const copy = channelCopy[channel];
+	const sent = sentText !== null;
 
 	function open() {
 		setMessage(null);
 		dialogRef.current?.showModal();
+	}
+
+	async function copyText(text: string) {
+		try {
+			await navigator.clipboard.writeText(text);
+			setCopied(true);
+		} catch {
+			setCopied(false);
+		}
 	}
 
 	function order(event: FormEvent<HTMLFormElement>) {
@@ -46,8 +81,12 @@ export function BuyButton({
 			setMessage("Enter a valid email so the LUT files can be sent back to you.");
 			return;
 		}
-		if (number.length < 8) {
+		if (channel === "whatsapp" && number.length < 8) {
 			setMessage("WhatsApp orders aren't set up yet. Try the contact form on the About page.");
+			return;
+		}
+		if (channel === "instagram" && !instagram) {
+			setMessage("Instagram orders aren't set up yet. Try the contact form on the About page.");
 			return;
 		}
 
@@ -61,10 +100,17 @@ export function BuyButton({
 			`Email: ${email}`,
 		];
 		if (note) lines.push(`Note: ${note}`);
-		const href = `https://wa.me/${number}?text=${encodeURIComponent(lines.join("\n"))}`;
-		window.open(href, "_blank", "noopener,noreferrer");
+		const text = lines.join("\n");
+
+		// Open the chat first, synchronously, so the browser treats it as part of the click.
+		if (channel === "whatsapp") {
+			window.open(`https://wa.me/${number}?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+		} else {
+			window.open(`https://ig.me/m/${instagram}`, "_blank", "noopener,noreferrer");
+			void copyText(text);
+		}
 		setMessage(null);
-		setSent(true);
+		setSentText(text);
 	}
 
 	return (
@@ -74,22 +120,23 @@ export function BuyButton({
 				onClick={open}
 				className={cn(
 					"flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 font-sans text-label-pill font-bold shadow-md transition-all hover:brightness-110 active:scale-[0.98]",
-					featured ? "bg-primary text-on-primary dark:shadow-glow" : "bg-primary-container text-on-primary",
+					copy.button,
+					featured && "dark:shadow-glow",
 				)}
 			>
-				<Icon name="chat" className="text-[18px]" />
-				{sent ? "Order again on WhatsApp" : `Order on WhatsApp — ${priceLabel}`}
+				<Icon name={copy.icon} className="text-[18px]" filled />
+				{sent ? `Order again on ${copy.name}` : `Order on ${copy.name} — ${priceLabel}`}
 			</button>
 
 			<dialog
 				ref={dialogRef}
-				aria-label={`Order ${productName} on WhatsApp`}
+				aria-label={`Order ${productName} on ${copy.name}`}
 				className="m-auto w-[min(92vw,420px)] rounded-2xl bg-surface-container-lowest p-0 text-on-surface shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm dark:border dark:border-primary/20 dark:bg-surface-container-low"
 			>
 				<div className="flex flex-col gap-4 p-5">
 					<div className="flex items-start justify-between gap-3">
 						<div>
-							<span className="font-mono text-label-mono uppercase tracking-wider text-tertiary">WhatsApp order</span>
+							<span className="font-mono text-label-mono uppercase tracking-wider text-tertiary">{copy.name} order</span>
 							<h2 className="font-headline text-headline-sm font-semibold">{productName}</h2>
 							<p className="font-mono text-[13px] font-bold text-primary">{priceLabel}</p>
 						</div>
@@ -107,14 +154,47 @@ export function BuyButton({
 						<div className="flex flex-col gap-3" aria-live="polite">
 							<p className="flex items-center gap-2 rounded-xl bg-primary-fixed px-3 py-2 font-sans text-body-dense font-semibold text-on-primary-fixed">
 								<Icon name="check_circle" className="text-[18px]" filled />
-								WhatsApp opened with your order.
+								{channel === "whatsapp" ? "WhatsApp opened with your order." : "Instagram chat opened."}
 							</p>
-							<p className="font-sans text-[13px] text-on-surface-variant">
-								Send that message. Amar replies on WhatsApp with payment details and the LUT files.
-							</p>
+							{channel === "whatsapp" ? (
+								<p className="font-sans text-[13px] text-on-surface-variant">
+									Send that message. Amar replies on WhatsApp with payment details and the LUT files.
+								</p>
+							) : (
+								<>
+									<p className="font-sans text-[13px] text-on-surface-variant">
+										{copied
+											? "Your order message is copied. Paste it into the chat and send it."
+											: "Instagram can't prefill a message. Copy this, paste it into the chat, and send it."}
+									</p>
+									<pre className="max-h-40 overflow-auto whitespace-pre-wrap rounded-xl bg-surface p-3 font-mono text-[12px] leading-relaxed text-on-surface">{sentText}</pre>
+									<div className="flex flex-col gap-2 sm:flex-row">
+										<button
+											type="button"
+											onClick={() => void copyText(sentText)}
+											className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 font-sans text-label-pill font-bold text-on-primary"
+										>
+											<Icon name={copied ? "check" : "content_copy"} className="text-[16px]" />
+											{copied ? "Copied" : "Copy message"}
+										</button>
+										<a
+											href={`https://ig.me/m/${instagram}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-surface-container px-4 py-2.5 font-sans text-label-pill font-bold text-on-surface hover:bg-surface-container-high"
+										>
+											<Icon name="open_in_new" className="text-[16px]" />
+											Reopen chat
+										</a>
+									</div>
+								</>
+							)}
 							<button
 								type="button"
-								onClick={() => setSent(false)}
+								onClick={() => {
+									setSentText(null);
+									setCopied(false);
+								}}
 								className="rounded-full bg-surface-container px-4 py-2.5 font-sans text-label-pill font-bold text-on-surface hover:bg-surface-container-high"
 							>
 								Edit details
@@ -168,13 +248,15 @@ export function BuyButton({
 							) : null}
 							<button
 								type="submit"
-								className="flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 font-sans font-bold text-white shadow-lg transition-all hover:brightness-110 active:scale-[0.98]"
+								className={cn("flex items-center justify-center gap-2 rounded-full px-5 py-3 font-sans font-bold shadow-lg transition-all hover:brightness-110 active:scale-[0.98]", copy.pill)}
 							>
-								<Icon name="chat" className="text-[18px]" filled />
-								Send order on WhatsApp
+								<Icon name={copy.icon} className="text-[18px]" filled />
+								{copy.submit}
 							</button>
 							<p className="text-center font-sans text-[11px] text-on-surface-variant">
-								This opens WhatsApp with the look, price, and your details already filled in. You send the message yourself.
+								{channel === "whatsapp"
+									? "This opens WhatsApp with the look, price, and your details already filled in. You send the message yourself."
+									: "This opens an Instagram chat with Amar and copies your order, so you can paste it and send it yourself."}
 							</p>
 						</form>
 					)}

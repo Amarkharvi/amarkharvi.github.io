@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BuyButton } from "@/components/shop/buy-button";
 import { LutPreview } from "@/components/shop/lut-preview";
+import { FactDeck } from "@/components/ui/fact-deck";
 import { Icon } from "@/components/ui/icon";
+import { getFacts } from "@/lib/facts";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { TiltCard } from "@/components/ui/tilt-card";
 import { cn } from "@/lib/cn";
 import { formatPrice, getProducts } from "@/lib/products";
-import { getSiteSettings } from "@/lib/site-settings";
+import { getSiteSettings, instagramUsername } from "@/lib/site-settings";
 
 export const metadata: Metadata = {
 	title: "LUT Shop",
@@ -17,16 +19,28 @@ export const metadata: Metadata = {
 
 const apps = ["DaVinci Resolve", "Premiere Pro", "Final Cut Pro", "CapCut Desktop", "After Effects", "OBS"];
 
-const faqs = [
-	{ q: "What do I get?", a: "A 33-point .cube LUT file for each look. Amar sends the files on WhatsApp after you message him from this page." },
-	{ q: "Which apps does it work in?", a: "Anything that reads .cube LUTs — DaVinci Resolve, Premiere Pro, Final Cut Pro, CapCut desktop, After Effects and OBS." },
-	{ q: "How do I pay?", a: "Tap Order on WhatsApp, send the prefilled message, and Amar replies with how to pay and the LUT files. No card checkout on this site." },
-	{ q: "Can I use it for client work?", a: "Yes — reels, ads and client projects are fine. Re-selling or sharing the LUT file itself isn't." },
-];
+function buildFaqs(chat: string, instagram: boolean) {
+	return [
+		{ q: "What do I get?", a: `A 33-point .cube LUT file for each look. Amar sends the files on ${chat} after you message him from this page.` },
+		{ q: "Which apps does it work in?", a: "Anything that reads .cube LUTs — DaVinci Resolve, Premiere Pro, Final Cut Pro, CapCut desktop, After Effects and OBS." },
+		{
+			q: "How do I pay?",
+			a: instagram
+				? "Tap Order on Instagram, paste the copied message into the chat and send it. Amar replies with how to pay and the LUT files. No card checkout on this site."
+				: "Tap Order on WhatsApp, send the prefilled message, and Amar replies with how to pay and the LUT files. No card checkout on this site.",
+		},
+		{ q: "Can I use it for client work?", a: "Yes — reels, ads and client projects are fine. Re-selling or sharing the LUT file itself isn't." },
+	];
+}
 
 export default async function ShopPage() {
-	const [products, settings] = await Promise.all([getProducts(), getSiteSettings()]);
+	const [products, settings, facts] = await Promise.all([getProducts(), getSiteSettings(), getFacts()]);
 	const [featured, ...singles] = [...products].sort((a, b) => Number(Boolean(b.badge)) - Number(Boolean(a.badge)));
+	const channel = settings.orderChannel;
+	const instagram = channel === "instagram";
+	const chat = instagram ? "Instagram" : "WhatsApp";
+	const instagramName = instagramUsername(settings.socials.instagram);
+	const faqs = buildFaqs(chat, instagram);
 
 	return (
 		<div className="flex flex-col gap-10 px-4 py-4 md:px-8">
@@ -39,8 +53,8 @@ export default async function ShopPage() {
 						The grades from my reels.
 					</h1>
 					<p className="max-w-2xl font-sans text-body-default text-on-primary-container">
-						The same looks I use on Instagram reels, portraits and product shoots, as .cube files you can drop into your editor. Message me on
-						WhatsApp to buy one.
+						The same looks I use on Instagram reels, portraits and product shoots, as .cube files you can drop into your editor. Message me on{" "}
+						{chat} to buy one.
 					</p>
 					<ul className="flex flex-wrap gap-1.5 pt-1">
 						{apps.map((app) => (
@@ -52,8 +66,10 @@ export default async function ShopPage() {
 				</div>
 			</section>
 
-			<section className="grid gap-6 rounded-2xl bg-surface-container-lowest p-5 shadow-card lg:grid-cols-[1.2fr_1fr] lg:items-center dark:border dark:border-primary/20 dark:bg-surface-container-low">
-				<LutPreview src={featured.image} alt={featured.imageAlt} filter={featured.preview} name={featured.name} />
+			<FactDeck label="Before you buy" facts={facts.shop} />
+
+			<section className="grid grid-cols-1 gap-6 rounded-2xl bg-surface-container-lowest p-5 shadow-card lg:grid-cols-[1.2fr_1fr] lg:items-center dark:border dark:border-primary/20 dark:bg-surface-container-low">
+				<LutPreview src={featured.image} alt={featured.imageAlt} filter={featured.preview} name={featured.name} before={featured.before} after={featured.after} />
 				<div className="flex flex-col gap-3">
 					<div className="flex items-center gap-2">
 						<span className="rounded-full bg-tertiary-fixed px-3 py-1 font-sans text-label-pill font-bold text-on-tertiary-fixed">{featured.badge}</span>
@@ -69,7 +85,9 @@ export default async function ShopPage() {
 						productName={featured.name}
 						priceLabel={formatPrice(featured.price)}
 						files={featured.files.map((file) => file.label)}
+						channel={channel}
 						whatsapp={settings.whatsapp}
+						instagram={instagramName}
 						featured
 					/>
 				</div>
@@ -77,7 +95,7 @@ export default async function ShopPage() {
 
 			<section className="flex flex-col gap-4">
 				<SectionHeading title="Single looks" icon="palette" aside={<span className="text-primary">.CUBE • 33³</span>} />
-				<div className="grid gap-4 md:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 					{singles.map((product, index) => (
 						<Reveal key={product.id} delay={index * 0.06}>
 							<TiltCard
@@ -85,7 +103,14 @@ export default async function ShopPage() {
 								strength={7}
 								className="flex h-full flex-col gap-3 rounded-2xl bg-surface-container-lowest p-4 shadow-card dark:border dark:border-primary/15 dark:bg-surface-container-low"
 							>
-								<LutPreview src={product.image} alt={product.imageAlt} filter={product.preview} name={product.name} />
+								<LutPreview
+									src={product.image}
+									alt={product.imageAlt}
+									filter={product.preview}
+									name={product.name}
+									before={product.before}
+									after={product.after}
+								/>
 								<div>
 									<h3 className="font-headline text-headline-sm font-semibold text-on-surface">{product.name}</h3>
 									<p className="font-sans text-body-dense text-primary">{product.tagline}</p>
@@ -103,7 +128,9 @@ export default async function ShopPage() {
 										productName={product.name}
 										priceLabel={formatPrice(product.price)}
 										files={product.files.map((file) => file.label)}
+										channel={channel}
 										whatsapp={settings.whatsapp}
+										instagram={instagramName}
 									/>
 								</div>
 							</TiltCard>
@@ -112,7 +139,7 @@ export default async function ShopPage() {
 				</div>
 			</section>
 
-			<section className="grid gap-4 md:grid-cols-2">
+			<section className="grid grid-cols-1 gap-4 md:grid-cols-2">
 				{faqs.map((faq) => (
 					<div key={faq.q} className="rounded-2xl bg-surface-container-low p-5 dark:border dark:border-primary/10">
 						<h3 className="font-sans text-body-default font-bold text-on-surface">{faq.q}</h3>
@@ -123,8 +150,8 @@ export default async function ShopPage() {
 
 			<footer className="flex flex-col items-center gap-2 border-t border-outline-variant pb-6 pt-5 text-center">
 				<span className="flex items-center gap-1.5 font-mono text-[11px] text-on-surface-variant">
-					<Icon name="chat" className="text-[14px] text-primary" />
-					Orders go to Amar on WhatsApp
+					<Icon name={instagram ? "photo_camera" : "chat"} className="text-[14px] text-primary" />
+					Orders go to Amar on {chat}
 				</span>
 				<Link href="/shop/policies" className="font-sans text-[12px] font-semibold text-primary hover:underline">
 					Terms, refunds &amp; privacy
