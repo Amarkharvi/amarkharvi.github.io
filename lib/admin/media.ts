@@ -4,10 +4,10 @@ import { mkdir, readdir, stat, unlink } from "node:fs/promises";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { del, list, put } from "@vercel/blob";
+import { uploadPublicPath } from "@/lib/media-url";
 import { isBlobStorageEnabled, requireWritableStorage } from "@/lib/storage";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "media", "uploads");
-const PUBLIC_PREFIX = "/media/uploads";
 const BLOB_PREFIX = "uploads/";
 
 const IMAGE_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"]);
@@ -55,7 +55,7 @@ async function listFromBlob(): Promise<MediaItem[]> {
 			if (!kind) continue;
 			items.push({
 				name,
-				url: blob.url,
+				url: uploadPublicPath(name),
 				kind,
 				size: blob.size,
 				uploadedAt: blob.uploadedAt.toISOString(),
@@ -76,7 +76,7 @@ async function listFromFs(): Promise<MediaItem[]> {
 					const info = await stat(path.join(UPLOAD_DIR, name));
 					const kind = kindOf(extOf(name));
 					return kind
-						? ({ name, url: `${PUBLIC_PREFIX}/${name}`, kind, size: info.size, uploadedAt: info.mtime.toISOString() } satisfies MediaItem)
+						? ({ name, url: uploadPublicPath(name), kind, size: info.size, uploadedAt: info.mtime.toISOString() } satisfies MediaItem)
 						: null;
 				}),
 		);
@@ -113,18 +113,18 @@ export async function saveMedia(file: File): Promise<MediaItem> {
 	const uploadedAt = new Date().toISOString();
 
 	if (mode === "blob") {
-		const blob = await put(`${BLOB_PREFIX}${name}`, file, {
-			access: "public",
+		await put(`${BLOB_PREFIX}${name}`, file, {
+			access: "private",
 			addRandomSuffix: false,
 			contentType: file.type || undefined,
 		});
-		return { name, url: blob.url, kind, size: file.size, uploadedAt };
+		return { name, url: uploadPublicPath(name), kind, size: file.size, uploadedAt };
 	}
 
 	await mkdir(UPLOAD_DIR, { recursive: true });
 	const buffer = Buffer.from(await file.arrayBuffer());
 	await writeFile(path.join(UPLOAD_DIR, name), buffer);
-	return { name, url: `${PUBLIC_PREFIX}/${name}`, kind, size: buffer.byteLength, uploadedAt };
+	return { name, url: uploadPublicPath(name), kind, size: buffer.byteLength, uploadedAt };
 }
 
 export async function deleteMedia(name: string): Promise<void> {

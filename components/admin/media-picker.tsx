@@ -33,7 +33,7 @@ export function MediaPicker({
 				<input
 					value={value}
 					onChange={(event) => onChange(event.target.value)}
-					placeholder="/media/uploads/your-file.jpg"
+					placeholder="/api/media/your-file.jpg"
 					className="min-w-0 flex-1 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 font-mono text-[12px] text-on-surface outline-none focus:border-primary"
 				/>
 				<button

@@ -2,6 +2,7 @@ import "server-only";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { get, put } from "@vercel/blob";
+import { rewriteMediaUrls } from "./media-url";
 import { isBlobStorageEnabled, requireWritableStorage } from "./storage";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -20,13 +21,13 @@ async function readFromBlob<T>(name: string): Promise<T | null> {
 	const result = await get(blobPathname(name), { access: "private", useCache: false });
 	if (!result || result.statusCode !== 200 || !result.stream) return null;
 	const text = await new Response(result.stream).text();
-	return JSON.parse(text) as T;
+	return rewriteMediaUrls(JSON.parse(text) as T);
 }
 
 async function readFromFs<T>(name: string, fallback: T): Promise<T> {
 	try {
 		const raw = await readFile(contentPath(name), "utf8");
-		return JSON.parse(raw) as T;
+		return rewriteMediaUrls(JSON.parse(raw) as T);
 	} catch (error) {
 		if ((error as NodeJS.ErrnoException)?.code === "ENOENT") return fallback;
 		console.error(`[content-store] failed to read "${name}"`, error);
@@ -52,7 +53,7 @@ export async function readContent<T>(name: string, fallback: T): Promise<T> {
 /** Writes content/<name>.json to Blob on Vercel, or atomically to disk when developing locally. */
 export async function writeContent<T>(name: string, data: T): Promise<void> {
 	const mode = requireWritableStorage();
-	const body = `${JSON.stringify(data, null, "\t")}\n`;
+	const body = `${JSON.stringify(rewriteMediaUrls(data), null, "\t")}\n`;
 	if (mode === "blob") {
 		await put(blobPathname(name), body, {
 			access: "private",
