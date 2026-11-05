@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { get } from "@vercel/blob";
+import { explainBlobError } from "@/lib/blob-errors";
 import { isBlobStorageEnabled } from "@/lib/storage";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "media", "uploads");
@@ -46,37 +47,42 @@ export async function GET(request: Request, context: RouteContext) {
 	const ifNoneMatch = request.headers.get("if-none-match") ?? undefined;
 
 	if (isBlobStorageEnabled()) {
-		const result = await get(`${BLOB_PREFIX}${name}`, {
-			access: "private",
-			headers: {
-				...(range ? { Range: range } : {}),
-				...(ifNoneMatch ? { "If-None-Match": ifNoneMatch } : {}),
-			},
-		});
-
-		if (!result) return new Response("Not found", { status: 404 });
-		if (result.statusCode === 304) {
-			return new Response(null, {
-				status: 304,
+		try {
+			const result = await get(`${BLOB_PREFIX}${name}`, {
+				access: "private",
 				headers: {
-					ETag: result.headers.get("etag") ?? "",
-					"Cache-Control": "public, max-age=31536000, immutable",
+					...(range ? { Range: range } : {}),
+					...(ifNoneMatch ? { "If-None-Match": ifNoneMatch } : {}),
 				},
 			});
+
+			if (!result) return new Response("Not found", { status: 404 });
+			if (result.statusCode === 304) {
+				return new Response(null, {
+					status: 304,
+					headers: {
+						ETag: result.headers.get("etag") ?? "",
+						"Cache-Control": "public, max-age=31536000, immutable",
+					},
+				});
+			}
+
+			const headers = new Headers();
+			headers.set("Content-Type", contentTypeFor(name, result.blob.contentType));
+			headers.set("Cache-Control", "public, max-age=31536000, immutable");
+			headers.set("X-Content-Type-Options", "nosniff");
+			headers.set("Accept-Ranges", "bytes");
+			const etag = result.headers.get("etag");
+			if (etag) headers.set("ETag", etag);
+			const contentLength = result.headers.get("content-length");
+			if (contentLength) headers.set("Content-Length", contentLength);
+			else if (typeof result.blob.size === "number") headers.set("Content-Length", String(result.blob.size));
+
+			return new Response(result.stream, { status: 200, headers });
+		} catch (error) {
+			console.error(`[api/media] ${explainBlobError(error)}`);
+			return new Response("Media store unavailable", { status: 503 });
 		}
-
-		const headers = new Headers();
-		headers.set("Content-Type", contentTypeFor(name, result.blob.contentType));
-		headers.set("Cache-Control", "public, max-age=31536000, immutable");
-		headers.set("X-Content-Type-Options", "nosniff");
-		headers.set("Accept-Ranges", "bytes");
-		const etag = result.headers.get("etag");
-		if (etag) headers.set("ETag", etag);
-		const contentLength = result.headers.get("content-length");
-		if (contentLength) headers.set("Content-Length", contentLength);
-		else if (typeof result.blob.size === "number") headers.set("Content-Length", String(result.blob.size));
-
-		return new Response(result.stream, { status: 200, headers });
 	}
 
 	const target = path.join(UPLOAD_DIR, name);

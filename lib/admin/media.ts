@@ -4,6 +4,7 @@ import { mkdir, readdir, stat, unlink } from "node:fs/promises";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { del, list, put } from "@vercel/blob";
+import { explainBlobError } from "@/lib/blob-errors";
 import { uploadPublicPath } from "@/lib/media-url";
 import { isBlobStorageEnabled, requireWritableStorage } from "@/lib/storage";
 
@@ -90,7 +91,13 @@ async function listFromFs(): Promise<MediaItem[]> {
 }
 
 export async function listMedia(): Promise<MediaItem[]> {
-	if (isBlobStorageEnabled()) return listFromBlob();
+	if (isBlobStorageEnabled()) {
+		try {
+			return await listFromBlob();
+		} catch (error) {
+			throw new Error(explainBlobError(error));
+		}
+	}
 	return listFromFs();
 }
 
@@ -113,11 +120,15 @@ export async function saveMedia(file: File): Promise<MediaItem> {
 	const uploadedAt = new Date().toISOString();
 
 	if (mode === "blob") {
-		await put(`${BLOB_PREFIX}${name}`, file, {
-			access: "private",
-			addRandomSuffix: false,
-			contentType: file.type || undefined,
-		});
+		try {
+			await put(`${BLOB_PREFIX}${name}`, file, {
+				access: "private",
+				addRandomSuffix: false,
+				contentType: file.type || undefined,
+			});
+		} catch (error) {
+			throw new Error(explainBlobError(error));
+		}
 		return { name, url: uploadPublicPath(name), kind, size: file.size, uploadedAt };
 	}
 
@@ -131,10 +142,14 @@ export async function deleteMedia(name: string): Promise<void> {
 	assertSafeName(name);
 	const mode = requireWritableStorage();
 	if (mode === "blob") {
-		const pathname = `${BLOB_PREFIX}${name}`;
-		const { blobs } = await list({ prefix: pathname, limit: 1 });
-		const match = blobs.find((blob) => blob.pathname === pathname);
-		if (match) await del(match.url);
+		try {
+			const pathname = `${BLOB_PREFIX}${name}`;
+			const { blobs } = await list({ prefix: pathname, limit: 1 });
+			const match = blobs.find((blob) => blob.pathname === pathname);
+			if (match) await del(match.url);
+		} catch (error) {
+			throw new Error(explainBlobError(error));
+		}
 		return;
 	}
 	const target = path.join(UPLOAD_DIR, name);

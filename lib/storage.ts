@@ -2,7 +2,7 @@ import "server-only";
 
 /** True when a Vercel Blob store is wired up (token for local / CI, or store id + OIDC on Vercel). */
 export function isBlobStorageEnabled(): boolean {
-	return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+	return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim() || process.env.BLOB_STORE_ID?.trim());
 }
 
 /** Running inside a Vercel deployment (preview or production). */

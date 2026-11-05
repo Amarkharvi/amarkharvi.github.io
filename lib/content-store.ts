@@ -2,6 +2,7 @@ import "server-only";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { get, put } from "@vercel/blob";
+import { explainBlobError, isMissingBlobStoreError } from "./blob-errors";
 import { rewriteMediaUrls } from "./media-url";
 import { isBlobStorageEnabled, requireWritableStorage } from "./storage";
 
@@ -42,9 +43,13 @@ export async function readContent<T>(name: string, fallback: T): Promise<T> {
 			const fromBlob = await readFromBlob<T>(name);
 			if (fromBlob !== null) return fromBlob;
 		} catch (error) {
-			console.error(`[content-store] blob read failed for "${name}"`, error);
+			if (isMissingBlobStoreError(error)) {
+				console.error(`[content-store] ${explainBlobError(error)}`);
+			} else {
+				console.error(`[content-store] blob read failed for "${name}"`, error);
+			}
 		}
-		// First deploy / empty store: fall through to the committed defaults on disk when present.
+		// First deploy / empty store / stale token: fall through to committed defaults on disk when present.
 		return readFromFs(name, fallback);
 	}
 	return readFromFs(name, fallback);
@@ -55,12 +60,16 @@ export async function writeContent<T>(name: string, data: T): Promise<void> {
 	const mode = requireWritableStorage();
 	const body = `${JSON.stringify(rewriteMediaUrls(data), null, "\t")}\n`;
 	if (mode === "blob") {
-		await put(blobPathname(name), body, {
-			access: "private",
-			addRandomSuffix: false,
-			allowOverwrite: true,
-			contentType: "application/json",
-		});
+		try {
+			await put(blobPathname(name), body, {
+				access: "private",
+				addRandomSuffix: false,
+				allowOverwrite: true,
+				contentType: "application/json",
+			});
+		} catch (error) {
+			throw new Error(explainBlobError(error));
+		}
 		return;
 	}
 	await mkdir(CONTENT_DIR, { recursive: true });
